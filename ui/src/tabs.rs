@@ -128,12 +128,28 @@ impl TabManager {
     }
 
     /// Get the active tab
+    ///
+    /// # Panics
+    /// Panics if active_tab_index is out of bounds. This should not happen
+    /// in normal operation as the index is always kept in sync with the tabs vector.
     pub fn active_tab(&self) -> &Tab {
+        debug_assert!(
+            self.active_tab_index < self.tabs.len(),
+            "Active tab index out of bounds"
+        );
         &self.tabs[self.active_tab_index]
     }
 
     /// Get the active tab mutably
+    ///
+    /// # Panics
+    /// Panics if active_tab_index is out of bounds. This should not happen
+    /// in normal operation as the index is always kept in sync with the tabs vector.
     pub fn active_tab_mut(&mut self) -> &mut Tab {
+        debug_assert!(
+            self.active_tab_index < self.tabs.len(),
+            "Active tab index out of bounds"
+        );
         &mut self.tabs[self.active_tab_index]
     }
 
@@ -190,6 +206,20 @@ impl TabManager {
     /// Get tab count
     pub fn tab_count(&self) -> usize {
         self.tabs.len()
+    }
+
+    /// Check internal invariants (for testing/debugging)
+    #[cfg(debug_assertions)]
+    #[allow(dead_code)]
+    fn check_invariants(&self) {
+        assert!(
+            !self.tabs.is_empty(),
+            "TabManager must have at least one tab"
+        );
+        assert!(
+            self.active_tab_index < self.tabs.len(),
+            "Active tab index must be valid"
+        );
     }
 }
 
