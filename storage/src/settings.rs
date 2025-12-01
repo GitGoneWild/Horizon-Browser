@@ -85,7 +85,7 @@ impl Default for GeneralSettings {
             });
 
         Self {
-            homepage: "about:blank".to_string(),
+            homepage: "about:home".to_string(),
             search_engine: "DuckDuckGo".to_string(),
             download_directory: download_dir,
         }
