@@ -3,6 +3,7 @@
 //! User interface layer for the Horizon Browser.
 //! Provides window management and UI components.
 
+pub mod tabs;
 pub mod theme;
 pub mod window;
 
