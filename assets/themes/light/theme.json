@@ -1,0 +1,24 @@
+{
+  "name": "Light",
+  "colors": {
+    "bg_primary": "#ffffff",
+    "bg_secondary": "#f6f8fa",
+    "bg_tertiary": "#eaeef2",
+    "fg_primary": "#24292f",
+    "fg_secondary": "#57606a",
+    "fg_muted": "#8b949e",
+    "accent_primary": "#0969da",
+    "accent_success": "#1a7f37",
+    "accent_warning": "#9a6700",
+    "accent_danger": "#cf222e",
+    "border_default": "#d0d7de",
+    "border_muted": "#eaeef2"
+  },
+  "typography": {
+    "font_family": "Inter, system-ui, sans-serif",
+    "font_size_base": 14,
+    "font_size_small": 12,
+    "font_size_large": 16,
+    "font_size_heading": 20
+  }
+}
