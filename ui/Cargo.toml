@@ -15,3 +15,4 @@ serde_json = { workspace = true }
 eframe = { workspace = true }
 egui = { workspace = true }
 uuid = { workspace = true }
+urlencoding = "2.1"

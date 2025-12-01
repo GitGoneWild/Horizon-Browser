@@ -56,6 +56,10 @@ impl BrowserWindow {
     }
 }
 
+// Constants for tab title display
+const MAX_TAB_TITLE_LENGTH: usize = 25;
+const TRUNCATE_AT: usize = 22;
+
 /// The main browser application state
 struct BrowserApp {
     /// Tab manager
@@ -76,6 +80,22 @@ impl BrowserApp {
             tab_manager,
             url_input,
             tab_to_close: None,
+        }
+    }
+
+    /// Process URL input and return a properly formatted URL
+    fn process_url_input(&self, input: &str) -> String {
+        if input.starts_with("http://")
+            || input.starts_with("https://")
+            || input.starts_with("about:")
+        {
+            input.to_string()
+        } else if input.contains('.') {
+            format!("https://{}", input)
+        } else {
+            // Treat as search query - URL encode the input
+            let encoded_query = urlencoding::encode(input);
+            format!("https://duckduckgo.com/?q={}", encoded_query)
         }
     }
 
@@ -286,8 +306,8 @@ impl eframe::App for BrowserApp {
                                 ui.horizontal(|ui| {
                                     // Tab title
                                     let title = tab.display_title();
-                                    let truncated_title = if title.len() > 25 {
-                                        format!("{}...", &title[..22])
+                                    let truncated_title = if title.len() > MAX_TAB_TITLE_LENGTH {
+                                        format!("{}...", &title[..TRUNCATE_AT])
                                     } else {
                                         title
                                     };
@@ -399,18 +419,7 @@ impl eframe::App for BrowserApp {
 
                     // Navigate on Enter key
                     if response.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
-                        let url = if self.url_input.starts_with("http://")
-                            || self.url_input.starts_with("https://")
-                            || self.url_input.starts_with("about:")
-                        {
-                            self.url_input.clone()
-                        } else if self.url_input.contains('.') {
-                            format!("https://{}", self.url_input)
-                        } else {
-                            // Treat as search query
-                            format!("https://duckduckgo.com/?q={}", self.url_input)
-                        };
-
+                        let url = self.process_url_input(&self.url_input);
                         self.tab_manager.active_tab_mut().navigate_to(&url);
                         self.url_input = url;
                         tracing::info!("Navigating to: {}", self.url_input);
@@ -418,18 +427,7 @@ impl eframe::App for BrowserApp {
 
                     // Go button
                     if ui.button("Go").clicked() {
-                        let url = if self.url_input.starts_with("http://")
-                            || self.url_input.starts_with("https://")
-                            || self.url_input.starts_with("about:")
-                        {
-                            self.url_input.clone()
-                        } else if self.url_input.contains('.') {
-                            format!("https://{}", self.url_input)
-                        } else {
-                            // Treat as search query
-                            format!("https://duckduckgo.com/?q={}", self.url_input)
-                        };
-
+                        let url = self.process_url_input(&self.url_input);
                         self.tab_manager.active_tab_mut().navigate_to(&url);
                         self.url_input = url;
                         tracing::info!("Navigating to: {}", self.url_input);
