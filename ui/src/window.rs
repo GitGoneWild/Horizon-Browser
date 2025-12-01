@@ -465,7 +465,7 @@ impl BrowserApp {
     /// Render the settings page with Firefox-inspired layout
     fn render_settings_page(&mut self, ui: &mut egui::Ui) {
         ui.vertical(|ui| {
-            // Top banner with Firefox branding
+            // Top banner with Horizon branding (Firefox-inspired styling)
             egui::Frame::none()
                 .fill(egui::Color32::from_rgb(31, 41, 51)) // Toolbar color
                 .inner_margin(egui::Margin::symmetric(20.0, 16.0))
