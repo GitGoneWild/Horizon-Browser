@@ -49,8 +49,8 @@ impl SpeedTestPhase {
     pub fn progress(&self) -> u8 {
         match self {
             Self::Ping => 10,
-            Self::Download(p) => 10 + (p / 2),  // 10-60
-            Self::Upload(p) => 60 + (p / 2),    // 60-100
+            Self::Download(p) => 10 + (p / 2), // 10-60
+            Self::Upload(p) => 60 + (p / 2),   // 60-100
             Self::Complete => 100,
         }
     }
@@ -81,7 +81,7 @@ impl Default for SpeedTestConfig {
             download_duration_secs: 10,
             upload_duration_secs: 10,
             download_size: 10 * 1024 * 1024, // 10 MB
-            upload_size: 1024 * 1024,    // 1 MB
+            upload_size: 1024 * 1024,        // 1 MB
         }
     }
 }
@@ -184,12 +184,12 @@ impl SpeedTestManager {
     /// Test ping/latency
     async fn test_ping(&self) -> Result<f64> {
         tracing::debug!("Testing ping...");
-        
+
         // Note: In a full implementation, this would:
         // 1. Make multiple HTTP HEAD requests to a test server
         // 2. Measure round-trip time for each request
         // 3. Calculate average latency
-        
+
         // Simulate ping test
         let mut total_ms = 0.0;
         for _ in 0..self.config.ping_count {
@@ -199,7 +199,7 @@ impl SpeedTestManager {
             let elapsed = start.elapsed().as_secs_f64() * 1000.0;
             total_ms += elapsed;
         }
-        
+
         let avg_ms = total_ms / self.config.ping_count as f64;
         Ok(avg_ms)
     }
@@ -217,10 +217,10 @@ impl SpeedTestManager {
         // 1. Download a file of known size from test server
         // 2. Measure time taken
         // 3. Calculate speed in Mbps
-        
+
         // Simulate download speed test
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-        
+
         // Simulate varying download speeds (50-150 Mbps)
         let speed = 50.0 + (rand::random::<f64>() * 100.0);
         Ok(speed)
@@ -232,10 +232,10 @@ impl SpeedTestManager {
         // 1. Upload data to test server
         // 2. Measure time taken
         // 3. Calculate speed in Mbps
-        
+
         // Simulate upload speed test
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-        
+
         // Simulate varying upload speeds (20-80 Mbps)
         let speed = 20.0 + (rand::random::<f64>() * 60.0);
         Ok(speed)
@@ -310,10 +310,12 @@ mod tests {
     #[tokio::test]
     async fn test_speed_test_run() {
         let mut manager = SpeedTestManager::new();
-        let result = manager.run_test(|phase| {
-            tracing::debug!("Phase: {:?}", phase);
-        }).await;
-        
+        let result = manager
+            .run_test(|phase| {
+                tracing::debug!("Phase: {:?}", phase);
+            })
+            .await;
+
         assert!(result.is_ok());
         let result = result.unwrap();
         assert!(result.download_mbps > 0.0);

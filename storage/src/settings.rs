@@ -221,7 +221,7 @@ experimental_features = false
 "#;
 
         let settings: Settings = toml::from_str(old_settings_toml).unwrap();
-        
+
         // Verify that https_only defaults to false when not present
         assert!(!settings.privacy.https_only);
         assert!(settings.privacy.tracking_protection);

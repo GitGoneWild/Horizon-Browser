@@ -172,7 +172,11 @@ impl Permission {
 
 impl Manifest {
     /// Create a new manifest with required fields
-    pub fn new(name: impl Into<String>, version: impl Into<String>, description: impl Into<String>) -> Self {
+    pub fn new(
+        name: impl Into<String>,
+        version: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Self {
         Self {
             manifest_version: 2, // Firefox WebExtensions use manifest v2
             id: None,
@@ -239,7 +243,11 @@ impl Manifest {
     }
 
     /// Set browser action
-    pub fn with_browser_action(mut self, title: impl Into<String>, popup: impl Into<String>) -> Self {
+    pub fn with_browser_action(
+        mut self,
+        title: impl Into<String>,
+        popup: impl Into<String>,
+    ) -> Self {
         self.browser_action = Some(BrowserAction {
             default_icon: None,
             default_title: Some(title.into()),
@@ -285,8 +293,8 @@ mod tests {
 
     #[test]
     fn test_manifest_serialization() {
-        let manifest = Manifest::new("Test Extension", "1.0.0", "Test description")
-            .with_id("test-ext");
+        let manifest =
+            Manifest::new("Test Extension", "1.0.0", "Test description").with_id("test-ext");
         let json = serde_json::to_string(&manifest).unwrap();
         let deserialized: Manifest = serde_json::from_str(&json).unwrap();
         assert_eq!(manifest.id, deserialized.id);

@@ -66,9 +66,9 @@ impl ColorPalette {
     pub fn dark() -> Self {
         Self {
             // Deep dark backgrounds with gradient support
-            bg_primary: Color::new(13, 17, 23),   // #0d1117
-            bg_secondary: Color::new(22, 27, 34), // #161b22
-            bg_tertiary: Color::new(33, 38, 45),  // #21262d
+            bg_primary: Color::new(13, 17, 23),        // #0d1117
+            bg_secondary: Color::new(22, 27, 34),      // #161b22
+            bg_tertiary: Color::new(33, 38, 45),       // #21262d
             bg_gradient_start: Color::new(30, 30, 30), // #1E1E1E
             bg_gradient_end: Color::new(42, 42, 42),   // #2A2A2A
 
@@ -78,18 +78,18 @@ impl ColorPalette {
             fg_muted: Color::new(87, 96, 106),       // #57606a
 
             // Accent colors with neon accents
-            accent_primary: Color::new(88, 166, 255),  // #58a6ff
+            accent_primary: Color::new(88, 166, 255), // #58a6ff
             accent_secondary: Color::new(139, 148, 255), // Lighter blue
             accent_neon_blue: Color::new(0, 191, 255), // #00BFFF - Neon blue for active states
             accent_neon_purple: Color::new(160, 32, 240), // #A020F0 - Neon purple for highlights
-            accent_success: Color::new(63, 185, 80),   // #3fb950
-            accent_warning: Color::new(187, 128, 9),   // #bb8009
-            accent_danger: Color::new(248, 81, 73),    // #f85149
+            accent_success: Color::new(63, 185, 80),  // #3fb950
+            accent_warning: Color::new(187, 128, 9),  // #bb8009
+            accent_danger: Color::new(248, 81, 73),   // #f85149
 
             // Borders with focus states
-            border_default: Color::new(48, 54, 61),  // #30363d
-            border_muted: Color::new(33, 38, 45),    // #21262d
-            border_focus: Color::new(0, 191, 255),   // #00BFFF - Neon blue for focus
+            border_default: Color::new(48, 54, 61), // #30363d
+            border_muted: Color::new(33, 38, 45),   // #21262d
+            border_focus: Color::new(0, 191, 255),  // #00BFFF - Neon blue for focus
         }
     }
 

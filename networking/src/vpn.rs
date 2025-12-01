@@ -252,9 +252,9 @@ impl VpnManager {
         // 2. For Proxy/SOCKS: configure reqwest client with proxy settings
         // 3. Monitor connection status and update statistics
         // For now, we simulate a successful connection
-        
+
         tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
-        
+
         self.status = VpnStatus::Connected;
         self.stats = VpnStats::default();
         tracing::info!("VPN connected successfully");
@@ -346,13 +346,7 @@ mod tests {
     #[test]
     fn test_socks_configuration() {
         let mut manager = VpnManager::new();
-        let result = manager.configure_socks(
-            5,
-            "socks.example.com".to_string(),
-            1080,
-            None,
-            None,
-        );
+        let result = manager.configure_socks(5, "socks.example.com".to_string(), 1080, None, None);
 
         assert!(result.is_ok());
         assert!(manager.config().is_some());
@@ -361,13 +355,7 @@ mod tests {
     #[test]
     fn test_invalid_socks_version() {
         let mut manager = VpnManager::new();
-        let result = manager.configure_socks(
-            3,
-            "socks.example.com".to_string(),
-            1080,
-            None,
-            None,
-        );
+        let result = manager.configure_socks(3, "socks.example.com".to_string(), 1080, None, None);
 
         assert!(result.is_err());
     }
