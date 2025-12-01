@@ -31,92 +31,144 @@ impl Color {
     }
 }
 
-/// Theme color palette inspired by modern browsers with gradient backgrounds
+/// Firefox-inspired color palette for light and dark modes
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ColorPalette {
-    // Background colors with gradient support
-    pub bg_primary: Color,
-    pub bg_secondary: Color,
-    pub bg_tertiary: Color,
-    pub bg_gradient_start: Color,
-    pub bg_gradient_end: Color,
+    // Window and panel backgrounds
+    pub bg_window: Color,
+    pub bg_toolbar: Color,
+    pub bg_tab_active: Color,
+    pub bg_tab_inactive: Color,
 
-    // Foreground colors
-    pub fg_primary: Color,
-    pub fg_secondary: Color,
-    pub fg_muted: Color,
+    // Text colors
+    pub text_primary: Color,
+    pub text_secondary: Color,
 
-    // Accent colors with neon accents for modern look
-    pub accent_primary: Color,
-    pub accent_secondary: Color,
-    pub accent_neon_blue: Color,
-    pub accent_neon_purple: Color,
-    pub accent_success: Color,
-    pub accent_warning: Color,
-    pub accent_danger: Color,
+    // Accent colors
+    pub accent: Color,
+    pub accent_hover: Color,
+
+    // Status colors
+    pub success: Color,
+    pub warning: Color,
+    pub error: Color,
 
     // Border colors
-    pub border_default: Color,
-    pub border_muted: Color,
-    pub border_focus: Color,
+    pub border_subtle: Color,
 }
 
 impl ColorPalette {
-    /// Create the default dark theme palette with modern gradient backgrounds
+    /// Create Firefox-inspired dark theme palette
     pub fn dark() -> Self {
         Self {
-            // Deep dark backgrounds with gradient support
-            bg_primary: Color::new(13, 17, 23),        // #0d1117
-            bg_secondary: Color::new(22, 27, 34),      // #161b22
-            bg_tertiary: Color::new(33, 38, 45),       // #21262d
-            bg_gradient_start: Color::new(30, 30, 30), // #1E1E1E
-            bg_gradient_end: Color::new(42, 42, 42),   // #2A2A2A
+            // Dark mode backgrounds (Firefox-inspired)
+            bg_window: Color::new(17, 24, 39),        // #111827 - Main window
+            bg_toolbar: Color::new(31, 41, 51),       // #1F2933 - Toolbar/tab strip
+            bg_tab_active: Color::new(17, 24, 39),    // #111827 - Active tab matches window
+            bg_tab_inactive: Color::new(31, 41, 51),  // #1F2933 - Inactive tabs
 
-            // Foreground colors
-            fg_primary: Color::new(230, 237, 243),   // #e6edf3
-            fg_secondary: Color::new(125, 140, 160), // #7d8ca0
-            fg_muted: Color::new(87, 96, 106),       // #57606a
+            // Text colors
+            text_primary: Color::new(249, 250, 251),  // #F9FAFB - Primary text
+            text_secondary: Color::new(156, 163, 175), // #9CA3AF - Secondary text
 
-            // Accent colors with neon accents
-            accent_primary: Color::new(88, 166, 255), // #58a6ff
-            accent_secondary: Color::new(139, 148, 255), // Lighter blue
-            accent_neon_blue: Color::new(0, 191, 255), // #00BFFF - Neon blue for active states
-            accent_neon_purple: Color::new(160, 32, 240), // #A020F0 - Neon purple for highlights
-            accent_success: Color::new(63, 185, 80),  // #3fb950
-            accent_warning: Color::new(187, 128, 9),  // #bb8009
-            accent_danger: Color::new(248, 81, 73),   // #f85149
+            // Accent colors (Firefox-inspired blue)
+            accent: Color::new(59, 130, 246),         // #3B82F6 - Primary accent
+            accent_hover: Color::new(96, 165, 250),   // #60A5FA - Hover state
 
-            // Borders with focus states
-            border_default: Color::new(48, 54, 61), // #30363d
-            border_muted: Color::new(33, 38, 45),   // #21262d
-            border_focus: Color::new(0, 191, 255),  // #00BFFF - Neon blue for focus
+            // Status colors
+            success: Color::new(34, 197, 94),         // #22C55E - Success/green
+            warning: Color::new(251, 191, 36),        // #FBBF24 - Warning/yellow
+            error: Color::new(248, 113, 113),         // #F87171 - Error/red
+
+            // Borders
+            border_subtle: Color::new(55, 65, 81),    // #374151 - Subtle borders
         }
     }
 
-    /// Create a light theme palette (placeholder for future implementation)
+    /// Create Firefox-inspired light theme palette
     pub fn light() -> Self {
         Self {
-            bg_primary: Color::new(255, 255, 255),
-            bg_secondary: Color::new(246, 248, 250),
-            bg_tertiary: Color::new(234, 238, 242),
-            bg_gradient_start: Color::new(240, 240, 240),
-            bg_gradient_end: Color::new(250, 250, 250),
+            // Light mode backgrounds (Firefox-inspired)
+            bg_window: Color::new(249, 250, 251),     // #F9FAFB - Main window
+            bg_toolbar: Color::new(229, 231, 235),    // #E5E7EB - Toolbar/tab strip
+            bg_tab_active: Color::new(255, 255, 255), // #FFFFFF - Active tab
+            bg_tab_inactive: Color::new(229, 231, 235), // #E5E7EB - Inactive tabs
 
-            fg_primary: Color::new(36, 41, 47),
-            fg_secondary: Color::new(87, 96, 106),
-            fg_muted: Color::new(139, 148, 158),
+            // Text colors
+            text_primary: Color::new(17, 24, 39),     // #111827 - Primary text
+            text_secondary: Color::new(75, 85, 99),   // #4B5563 - Secondary text
 
-            accent_primary: Color::new(9, 105, 218),
-            accent_secondary: Color::new(88, 166, 255),
-            accent_neon_blue: Color::new(0, 120, 215),
-            accent_neon_purple: Color::new(120, 20, 180),
-            accent_success: Color::new(26, 127, 55),
-            accent_warning: Color::new(154, 103, 0),
-            accent_danger: Color::new(207, 34, 46),
+            // Accent colors (Firefox-inspired blue)
+            accent: Color::new(37, 99, 235),          // #2563EB - Primary accent
+            accent_hover: Color::new(29, 78, 216),    // #1D4ED8 - Hover state
 
-            border_default: Color::new(208, 215, 222),
-            border_muted: Color::new(234, 238, 242),
-            border_focus: Color::new(0, 120, 215),
+            // Status colors
+            success: Color::new(22, 163, 74),         // #16A34A - Success/green
+            warning: Color::new(234, 179, 8),         // #EAB308 - Warning/yellow
+            error: Color::new(220, 38, 38),           // #DC2626 - Error/red
+
+            // Borders
+            border_subtle: Color::new(209, 213, 219), // #D1D5DB - Subtle borders
+        }
+    }
+}
+
+/// Spacing system based on 4px unit
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Spacing {
+    pub unit: i32,       // Base unit: 4px
+    pub small: i32,      // 4px
+    pub standard: i32,   // 8px
+    pub large: i32,      // 12-16px
+}
+
+impl Default for Spacing {
+    fn default() -> Self {
+        Self {
+            unit: 4,
+            small: 4,
+            standard: 8,
+            large: 12,
+        }
+    }
+}
+
+/// Border radii for different component types
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Radii {
+    pub button: f32,     // 4px
+    pub tab: f32,        // 4px
+    pub field: f32,      // 6-8px for inputs
+    pub panel: f32,      // 6px for panels/cards
+}
+
+impl Default for Radii {
+    fn default() -> Self {
+        Self {
+            button: 4.0,
+            tab: 4.0,
+            field: 6.0,
+            panel: 6.0,
+        }
+    }
+}
+
+/// Typography settings
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Typography {
+    pub base_size: u16,    // 14px
+    pub tab_size: u16,     // 13px
+    pub menu_size: u16,    // 13px
+    pub font_family: String,
+}
+
+impl Default for Typography {
+    fn default() -> Self {
+        Self {
+            base_size: 14,
+            tab_size: 13,
+            menu_size: 13,
+            font_family: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif".to_string(),
         }
     }
 }
@@ -126,8 +178,9 @@ impl ColorPalette {
 pub struct Theme {
     name: String,
     palette: ColorPalette,
-    font_family: String,
-    font_size: u16,
+    spacing: Spacing,
+    radii: Radii,
+    typography: Typography,
 }
 
 impl Theme {
@@ -136,8 +189,9 @@ impl Theme {
         Self {
             name: name.into(),
             palette,
-            font_family: "Inter, system-ui, sans-serif".to_string(),
-            font_size: 14,
+            spacing: Spacing::default(),
+            radii: Radii::default(),
+            typography: Typography::default(),
         }
     }
 
@@ -151,14 +205,29 @@ impl Theme {
         &self.palette
     }
 
-    /// Get font family
-    pub fn font_family(&self) -> &str {
-        &self.font_family
+    /// Get spacing
+    pub fn spacing(&self) -> &Spacing {
+        &self.spacing
     }
 
-    /// Get font size
+    /// Get radii
+    pub fn radii(&self) -> &Radii {
+        &self.radii
+    }
+
+    /// Get typography
+    pub fn typography(&self) -> &Typography {
+        &self.typography
+    }
+
+    /// Get font family (convenience method)
+    pub fn font_family(&self) -> &str {
+        &self.typography.font_family
+    }
+
+    /// Get font size (convenience method)
     pub fn font_size(&self) -> u16 {
-        self.font_size
+        self.typography.base_size
     }
 }
 
@@ -192,13 +261,13 @@ mod tests {
     fn test_dark_theme() {
         let theme = Theme::default();
         assert_eq!(theme.name(), "Dark");
-        assert_eq!(theme.palette().bg_primary.r, 13);
+        assert_eq!(theme.palette().bg_window.r, 17);
     }
 
     #[test]
     fn test_light_theme() {
         let theme = Theme::new("Light", ColorPalette::light());
         assert_eq!(theme.name(), "Light");
-        assert_eq!(theme.palette().bg_primary.r, 255);
+        assert_eq!(theme.palette().bg_window.r, 249);
     }
 }

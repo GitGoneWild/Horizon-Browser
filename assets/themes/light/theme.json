@@ -1,24 +1,35 @@
 {
   "name": "Light",
   "colors": {
-    "bg_primary": "#ffffff",
-    "bg_secondary": "#f6f8fa",
-    "bg_tertiary": "#eaeef2",
-    "fg_primary": "#24292f",
-    "fg_secondary": "#57606a",
-    "fg_muted": "#8b949e",
-    "accent_primary": "#0969da",
-    "accent_success": "#1a7f37",
-    "accent_warning": "#9a6700",
-    "accent_danger": "#cf222e",
-    "border_default": "#d0d7de",
-    "border_muted": "#eaeef2"
+    "bg_window": "#F9FAFB",
+    "bg_toolbar": "#E5E7EB",
+    "bg_tab_active": "#FFFFFF",
+    "bg_tab_inactive": "#E5E7EB",
+    "text_primary": "#111827",
+    "text_secondary": "#4B5563",
+    "accent": "#2563EB",
+    "accent_hover": "#1D4ED8",
+    "success": "#16A34A",
+    "warning": "#EAB308",
+    "error": "#DC2626",
+    "border_subtle": "#D1D5DB"
+  },
+  "spacing": {
+    "unit": 4,
+    "small": 4,
+    "standard": 8,
+    "large": 12
+  },
+  "radii": {
+    "button": 4,
+    "tab": 4,
+    "field": 6,
+    "panel": 6
   },
   "typography": {
-    "font_family": "Inter, system-ui, sans-serif",
-    "font_size_base": 14,
-    "font_size_small": 12,
-    "font_size_large": 16,
-    "font_size_heading": 20
+    "font_family": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    "base_size": 14,
+    "tab_size": 13,
+    "menu_size": 13
   }
 }
