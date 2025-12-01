@@ -4,6 +4,7 @@
 //! Provides window management and UI components.
 
 pub mod settings;
+pub mod sidebar;
 pub mod tabs;
 pub mod theme;
 pub mod window;
