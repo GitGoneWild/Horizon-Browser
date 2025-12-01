@@ -27,7 +27,11 @@ impl Response {
         let mut headers = HashMap::new();
 
         for (name, value) in response.headers() {
-            headers.insert(name.to_string(), value.to_str().unwrap_or("").to_string());
+            let value_str = value.to_str().unwrap_or_else(|_| {
+                tracing::warn!("Failed to convert header '{}' to UTF-8", name);
+                ""
+            });
+            headers.insert(name.to_string(), value_str.to_string());
         }
 
         let body = response.bytes().await?.to_vec();

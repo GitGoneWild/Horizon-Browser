@@ -96,10 +96,10 @@ impl HorizonApp {
                 .ok_or_else(|| anyhow::anyhow!("Failed to get data directory"))?
                 .join("Horizon")
         } else {
-            // Linux: ~/.local/share/horizon
+            // Linux: ~/.local/share/Horizon (consistent casing)
             dirs::data_dir()
                 .ok_or_else(|| anyhow::anyhow!("Failed to get data directory"))?
-                .join("horizon")
+                .join("Horizon")
         };
 
         Ok(data_dir)

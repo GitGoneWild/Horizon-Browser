@@ -73,10 +73,21 @@ pub struct GeneralSettings {
 
 impl Default for GeneralSettings {
     fn default() -> Self {
+        // Use platform-appropriate download directory
+        let download_dir = dirs::download_dir()
+            .and_then(|p| p.to_str().map(|s| s.to_string()))
+            .unwrap_or_else(|| {
+                if cfg!(target_os = "windows") {
+                    "C:\\Users\\Downloads".to_string()
+                } else {
+                    "/tmp/downloads".to_string()
+                }
+            });
+
         Self {
             homepage: "about:blank".to_string(),
             search_engine: "DuckDuckGo".to_string(),
-            download_directory: "~/Downloads".to_string(),
+            download_directory: download_dir,
         }
     }
 }
