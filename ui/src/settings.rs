@@ -22,7 +22,9 @@ pub struct SettingsUI {
 
 /// Settings panel enum
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Default)]
 pub enum SettingsPanel {
+    #[default]
     General,
     Privacy,
     Appearance,
@@ -30,11 +32,6 @@ pub enum SettingsPanel {
     Advanced,
 }
 
-impl Default for SettingsPanel {
-    fn default() -> Self {
-        Self::General
-    }
-}
 
 /// General settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -225,6 +222,81 @@ impl SettingsUI {
     pub fn load() -> Self {
         // TODO: Load from actual storage
         Self::new()
+    }
+
+    /// Convert from storage settings
+    pub fn from_storage(storage_settings: &horizon_storage::settings::Settings) -> Self {
+        let search_engine = match storage_settings.general.search_engine.as_str() {
+            "Google" => SearchEngine::Google,
+            "Bing" => SearchEngine::Bing,
+            "Brave" => SearchEngine::Brave,
+            _ => SearchEngine::DuckDuckGo,
+        };
+
+        let theme = match storage_settings.appearance.theme.as_str() {
+            "Light" => Theme::Light,
+            _ => Theme::Dark,
+        };
+
+        Self {
+            general: GeneralSettings {
+                homepage: storage_settings.general.homepage.clone(),
+                search_engine,
+                restore_tabs_on_startup: storage_settings.general.restore_tabs_on_startup,
+            },
+            privacy: PrivacySettings {
+                tracking_protection: storage_settings.privacy.tracking_protection,
+                do_not_track: storage_settings.privacy.do_not_track,
+                block_third_party_cookies: storage_settings.privacy.block_third_party_cookies,
+                clear_data_on_exit: storage_settings.privacy.clear_on_exit,
+                https_only: storage_settings.privacy.https_only,
+            },
+            appearance: AppearanceSettings {
+                theme,
+                font_size: storage_settings.appearance.font_size,
+                show_bookmarks_bar: storage_settings.appearance.show_bookmarks_bar,
+            },
+            downloads: DownloadsSettings {
+                download_directory: storage_settings.general.download_directory.clone(),
+                ask_where_to_save: storage_settings.general.ask_where_to_save,
+            },
+            advanced: AdvancedSettings {
+                enable_developer_tools: storage_settings.advanced.enable_developer_tools,
+                hardware_acceleration: storage_settings.advanced.hardware_acceleration,
+                experimental_features: storage_settings.advanced.experimental_features,
+            },
+            selected_panel: SettingsPanel::default(),
+        }
+    }
+
+    /// Convert to storage settings
+    pub fn to_storage(&self) -> horizon_storage::settings::Settings {
+        horizon_storage::settings::Settings {
+            general: horizon_storage::settings::GeneralSettings {
+                homepage: self.general.homepage.clone(),
+                search_engine: self.general.search_engine.name().to_string(),
+                download_directory: self.downloads.download_directory.clone(),
+                restore_tabs_on_startup: self.general.restore_tabs_on_startup,
+                ask_where_to_save: self.downloads.ask_where_to_save,
+            },
+            privacy: horizon_storage::settings::PrivacySettings {
+                tracking_protection: self.privacy.tracking_protection,
+                do_not_track: self.privacy.do_not_track,
+                block_third_party_cookies: self.privacy.block_third_party_cookies,
+                clear_on_exit: self.privacy.clear_data_on_exit,
+                https_only: self.privacy.https_only,
+            },
+            appearance: horizon_storage::settings::AppearanceSettings {
+                theme: self.appearance.theme.name().to_string(),
+                font_size: self.appearance.font_size,
+                show_bookmarks_bar: self.appearance.show_bookmarks_bar,
+            },
+            advanced: horizon_storage::settings::AdvancedSettings {
+                enable_developer_tools: self.advanced.enable_developer_tools,
+                hardware_acceleration: self.advanced.hardware_acceleration,
+                experimental_features: self.advanced.experimental_features,
+            },
+        }
     }
 
     /// Save settings to storage

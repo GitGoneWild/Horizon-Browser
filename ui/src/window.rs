@@ -689,20 +689,18 @@ impl eframe::App for BrowserApp {
             }
 
             // Alt+Left: Back
-            if i.modifiers.alt && i.key_pressed(egui::Key::ArrowLeft) {
-                if self.tab_manager.active_tab().can_go_back() {
+            if i.modifiers.alt && i.key_pressed(egui::Key::ArrowLeft)
+                && self.tab_manager.active_tab().can_go_back() {
                     self.tab_manager.active_tab_mut().go_back();
                     self.url_input = self.tab_manager.active_tab().url.clone();
                 }
-            }
 
             // Alt+Right: Forward
-            if i.modifiers.alt && i.key_pressed(egui::Key::ArrowRight) {
-                if self.tab_manager.active_tab().can_go_forward() {
+            if i.modifiers.alt && i.key_pressed(egui::Key::ArrowRight)
+                && self.tab_manager.active_tab().can_go_forward() {
                     self.tab_manager.active_tab_mut().go_forward();
                     self.url_input = self.tab_manager.active_tab().url.clone();
                 }
-            }
 
             // Alt+Home: Go to home
             if i.modifiers.alt && i.key_pressed(egui::Key::Home) {
@@ -752,10 +750,24 @@ impl eframe::App for BrowserApp {
                         egui::Frame::none()
                             .fill(bg_color)
                             .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
-                            .inner_margin(egui::Margin::symmetric(12.0, 8.0))
-                            .rounding(egui::Rounding::same(4.0))
+                            .inner_margin(egui::Margin::symmetric(12.0, 6.0))
+                            .rounding(egui::Rounding {
+                                nw: 6.0,
+                                ne: 6.0,
+                                sw: 0.0,
+                                se: 0.0,
+                            })
                             .show(ui, |ui| {
                                 ui.horizontal(|ui| {
+                                    // Loading indicator
+                                    if tab.is_loading {
+                                        ui.label(
+                                            egui::RichText::new("⟳")
+                                                .size(10.0)
+                                                .color(egui::Color32::from_rgb(88, 166, 255)),
+                                        );
+                                    }
+
                                     // Tab title
                                     let title = tab.display_title();
                                     let truncated_title = if title.len() > MAX_TAB_TITLE_LENGTH {
@@ -774,7 +786,8 @@ impl eframe::App for BrowserApp {
                                         .add(
                                             egui::Label::new(
                                                 egui::RichText::new(truncated_title)
-                                                    .color(text_color),
+                                                    .color(text_color)
+                                                    .size(13.0),
                                             )
                                             .sense(egui::Sense::click()),
                                         )
@@ -784,8 +797,22 @@ impl eframe::App for BrowserApp {
                                     }
 
                                     // Close button
+                                    let close_color = if is_active {
+                                        egui::Color32::from_rgb(230, 237, 243)
+                                    } else {
+                                        egui::Color32::from_rgb(125, 140, 160)
+                                    };
+
                                     if ui
-                                        .add(egui::Button::new("✕").frame(false).small())
+                                        .add(
+                                            egui::Button::new(
+                                                egui::RichText::new("✕")
+                                                    .size(12.0)
+                                                    .color(close_color),
+                                            )
+                                            .frame(false)
+                                            .small(),
+                                        )
                                         .clicked()
                                     {
                                         self.tab_to_close = Some(index);
@@ -797,8 +824,14 @@ impl eframe::App for BrowserApp {
                     }
 
                     // New tab button
+                    ui.add_space(4.0);
                     if ui
-                        .add(egui::Button::new("➕").frame(true).small())
+                        .add(
+                            egui::Button::new(egui::RichText::new("➕").size(14.0))
+                                .frame(true)
+                                .small(),
+                        )
+                        .on_hover_text("New tab (Ctrl+T)")
                         .clicked()
                     {
                         new_tab_clicked = true;

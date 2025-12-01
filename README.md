@@ -101,24 +101,56 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Status
 
-✅ **MVP Complete** - Horizon Browser now includes full tab management, navigation controls, address bar, and a beautiful dark theme UI. The browser is functional and ready for testing!
+✅ **Enhanced MVP Complete** - Horizon Browser now includes comprehensive features including full settings management, keyboard shortcuts, enhanced navigation, and a polished dark theme UI. The browser is functional and ready for testing!
 
 ## Current Features
 
+### Core Browsing
 - ✅ Multiple tab management (open, close, switch tabs)
+- ✅ Tab loading indicators
 - ✅ Address bar with URL navigation and search
-- ✅ Back/forward/reload navigation
+- ✅ Configurable search engines (DuckDuckGo, Google, Bing, Brave)
+- ✅ Back/forward/reload/stop/home navigation
 - ✅ Navigation history per tab
-- ✅ Default home page (about:home)
+- ✅ Enhanced home page (about:home) with modern design
 - ✅ Modern dark theme UI (GitHub-inspired)
 - ✅ Cross-platform desktop support
+
+### Settings & Configuration
+- ✅ Full settings page (about:settings) with 5 panels:
+  - **General**: Homepage, search engine, startup options
+  - **Privacy**: Tracking protection, Do Not Track, cookie blocking, HTTPS-only mode
+  - **Appearance**: Theme selection, font size, bookmarks bar
+  - **Downloads**: Download directory, save preferences
+  - **Advanced**: Developer tools, hardware acceleration, experimental features
+- ✅ Settings persistence (ready for storage integration)
 - ✅ Privacy-first default settings
+
+### Keyboard Shortcuts
+- ✅ Ctrl+T: New tab
+- ✅ Ctrl+W: Close tab
+- ✅ Ctrl+R / F5: Reload page
+- ✅ Alt+Left: Go back
+- ✅ Alt+Right: Go forward
+- ✅ Alt+Home: Go to home page
+- ✅ Ctrl+L: Focus address bar
+
+### UI/UX Enhancements
+- ✅ Modern icons with tooltips showing shortcuts
+- ✅ Stop/Reload toggle button
+- ✅ Home button for quick access
+- ✅ Settings button for easy configuration
+- ✅ Improved tab styling with rounded corners and better spacing
+- ✅ Loading indicators in tabs
+- ✅ Enhanced home page with feature showcase
+- ✅ Better color scheme and visual hierarchy
 
 See [FEATURES.md](docs/FEATURES.md) for detailed feature documentation.
 
 ## Roadmap
 
 - [x] MVP: Basic browsing functionality
+- [x] Enhanced MVP: Settings, keyboard shortcuts, polished UI
 - [ ] Alpha: Full rendering engine integration (WebView/Servo)
 - [ ] Beta: Extension support and advanced theming
 - [ ] Release: Stable public release
