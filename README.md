@@ -101,12 +101,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Status
 
-🚧 **Under Active Development** - Horizon Browser is in early development. The current version provides a basic working browser window with foundational systems in place.
+✅ **MVP Complete** - Horizon Browser now includes full tab management, navigation controls, address bar, and a beautiful dark theme UI. The browser is functional and ready for testing!
+
+## Current Features
+
+- ✅ Multiple tab management (open, close, switch tabs)
+- ✅ Address bar with URL navigation and search
+- ✅ Back/forward/reload navigation
+- ✅ Navigation history per tab
+- ✅ Default home page (about:home)
+- ✅ Modern dark theme UI (GitHub-inspired)
+- ✅ Cross-platform desktop support
+- ✅ Privacy-first default settings
+
+See [FEATURES.md](docs/FEATURES.md) for detailed feature documentation.
 
 ## Roadmap
 
-- [ ] MVP: Basic browsing functionality
-- [ ] Alpha: Full rendering engine integration
-- [ ] Beta: Extension support and theming
+- [x] MVP: Basic browsing functionality
+- [ ] Alpha: Full rendering engine integration (WebView/Servo)
+- [ ] Beta: Extension support and advanced theming
 - [ ] Release: Stable public release
 
