@@ -1,0 +1,25 @@
+[package]
+name = "horizon-launcher"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "horizon"
+path = "src/main.rs"
+
+[dependencies]
+horizon-engine = { path = "../engine" }
+horizon-ui = { path = "../ui" }
+horizon-networking = { path = "../networking" }
+horizon-storage = { path = "../storage" }
+horizon-extensions = { path = "../extensions" }
+horizon-sandbox = { path = "../sandbox" }
+
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+dirs = { workspace = true }

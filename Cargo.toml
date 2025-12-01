@@ -1,0 +1,64 @@
+[workspace]
+resolver = "2"
+members = [
+    "engine",
+    "ui",
+    "networking",
+    "storage",
+    "extensions",
+    "sandbox",
+    "launcher",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Horizon Browser Team"]
+license = "MIT"
+repository = "https://github.com/GitGoneWild/Horizon-Browser"
+homepage = "https://github.com/GitGoneWild/Horizon-Browser"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1.42", features = ["full"] }
+async-trait = "0.1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "2.0"
+
+# HTTP client
+reqwest = { version = "0.12", features = ["json"] }
+
+# Configuration
+config = "0.14"
+
+# UI framework (using egui for cross-platform GUI)
+eframe = "0.29"
+egui = "0.29"
+
+# Cross-platform windowing
+winit = "0.30"
+
+# Utilities
+uuid = { version = "1.11", features = ["v4"] }
+dirs = "5.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
