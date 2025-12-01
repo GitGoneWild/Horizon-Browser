@@ -36,14 +36,8 @@ impl DnsProvider {
     pub fn servers(&self) -> Vec<IpAddr> {
         match self {
             Self::System => vec![],
-            Self::Google => vec![
-                "8.8.8.8".parse().unwrap(),
-                "8.8.4.4".parse().unwrap(),
-            ],
-            Self::Cloudflare => vec![
-                "1.1.1.1".parse().unwrap(),
-                "1.0.0.1".parse().unwrap(),
-            ],
+            Self::Google => vec!["8.8.8.8".parse().unwrap(), "8.8.4.4".parse().unwrap()],
+            Self::Cloudflare => vec!["1.1.1.1".parse().unwrap(), "1.0.0.1".parse().unwrap()],
             Self::Quad9 => vec![
                 "9.9.9.9".parse().unwrap(),
                 "149.112.112.112".parse().unwrap(),
@@ -98,10 +92,7 @@ impl DnsResolver {
 
     /// Update the DNS configuration
     pub fn set_config(&mut self, config: DnsConfig) {
-        tracing::info!(
-            "DNS configuration updated to: {}",
-            config.provider.name()
-        );
+        tracing::info!("DNS configuration updated to: {}", config.provider.name());
         self.config = config;
     }
 
@@ -132,7 +123,7 @@ impl DnsResolver {
             hostname,
             self.config.provider.name()
         );
-        
+
         // Note: In a full implementation, this would use the configured DNS servers
         // For now, we use the system resolver regardless of configuration
         // A complete implementation would use libraries like trust-dns-resolver
@@ -140,7 +131,7 @@ impl DnsResolver {
             .await?
             .map(|addr| addr.ip())
             .collect();
-        
+
         tracing::debug!("Resolved {} to {:?}", hostname, addrs);
         Ok(addrs)
     }

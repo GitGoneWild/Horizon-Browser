@@ -95,12 +95,12 @@ impl PasswordManager {
     pub fn with_storage_path(path: std::path::PathBuf) -> Result<Self> {
         let mut manager = Self::new();
         manager.storage_path = Some(path.clone());
-        
+
         // Load existing passwords if file exists
         if path.exists() {
             manager.load(&path)?;
         }
-        
+
         Ok(manager)
     }
 
@@ -108,7 +108,7 @@ impl PasswordManager {
     pub fn add_password(&mut self, url: String, username: String, password: String) -> Result<()> {
         let entry = PasswordEntry::new(url.clone(), username.clone(), password);
         let normalized_url = PasswordEntry::normalize_url(&url);
-        
+
         // Check if this username already exists for this URL
         if let Some(entries) = self.passwords.get(&normalized_url) {
             if entries.iter().any(|e| e.username == username) {
@@ -119,12 +119,12 @@ impl PasswordManager {
                 ));
             }
         }
-        
+
         self.passwords
             .entry(normalized_url.clone())
             .or_default()
             .push(entry);
-        
+
         self.modified = true;
         tracing::info!("Added password for {} on {}", username, normalized_url);
         Ok(())
@@ -149,9 +149,14 @@ impl PasswordManager {
     }
 
     /// Update an existing password
-    pub fn update_password(&mut self, url: &str, username: &str, new_password: String) -> Result<()> {
+    pub fn update_password(
+        &mut self,
+        url: &str,
+        username: &str,
+        new_password: String,
+    ) -> Result<()> {
         let normalized_url = PasswordEntry::normalize_url(url);
-        
+
         if let Some(entries) = self.passwords.get_mut(&normalized_url) {
             if let Some(entry) = entries.iter_mut().find(|e| e.username == username) {
                 entry.update_password(new_password);
@@ -160,7 +165,7 @@ impl PasswordManager {
                 return Ok(());
             }
         }
-        
+
         Err(anyhow!(
             "Password not found for {} on {}",
             username,
@@ -171,24 +176,24 @@ impl PasswordManager {
     /// Delete a password entry
     pub fn delete_password(&mut self, url: &str, username: &str) -> Result<()> {
         let normalized_url = PasswordEntry::normalize_url(url);
-        
+
         if let Some(entries) = self.passwords.get_mut(&normalized_url) {
             let initial_len = entries.len();
             entries.retain(|e| e.username != username);
-            
+
             if entries.len() < initial_len {
                 self.modified = true;
-                
+
                 // Remove the URL entry if no passwords remain
                 if entries.is_empty() {
                     self.passwords.remove(&normalized_url);
                 }
-                
+
                 tracing::info!("Deleted password for {} on {}", username, normalized_url);
                 return Ok(());
             }
         }
-        
+
         Err(anyhow!(
             "Password not found for {} on {}",
             username,
@@ -248,7 +253,7 @@ impl PasswordManager {
     pub fn save(&self, path: &Path) -> Result<()> {
         // Note: In a full implementation, passwords would be encrypted before saving
         // using a master password or system keychain integration
-        
+
         let json = serde_json::to_string_pretty(&self.passwords)?;
         std::fs::write(path, json)?;
         tracing::info!("Saved passwords to {:?}", path);
@@ -269,7 +274,7 @@ impl PasswordManager {
         if !path.exists() {
             return Ok(());
         }
-        
+
         let json = std::fs::read_to_string(path)?;
         self.passwords = serde_json::from_str(&json)?;
         self.modified = false;
@@ -280,7 +285,7 @@ impl PasswordManager {
     /// Auto-fill suggestions for a URL
     pub fn get_autofill_suggestions(&self, url: &str) -> Vec<AutofillSuggestion> {
         let normalized_url = PasswordEntry::normalize_url(url);
-        
+
         self.passwords
             .get(&normalized_url)
             .map(|entries| {
@@ -443,7 +448,7 @@ mod tests {
     fn test_save_load() {
         let temp_file = NamedTempFile::new().unwrap();
         let mut manager = PasswordManager::new();
-        
+
         manager
             .add_password(
                 "https://example.com".to_string(),

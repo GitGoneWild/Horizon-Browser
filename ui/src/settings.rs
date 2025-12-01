@@ -23,8 +23,7 @@ pub struct SettingsUI {
 }
 
 /// Settings panel enum
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum SettingsPanel {
     #[default]
     General,
@@ -36,7 +35,6 @@ pub enum SettingsPanel {
     Downloads,
     Advanced,
 }
-
 
 /// General settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -252,7 +250,13 @@ impl DnsProvider {
     }
 
     pub fn all() -> &'static [Self] {
-        &[Self::System, Self::Google, Self::Cloudflare, Self::Quad9, Self::Custom]
+        &[
+            Self::System,
+            Self::Google,
+            Self::Cloudflare,
+            Self::Quad9,
+            Self::Custom,
+        ]
     }
 }
 
@@ -329,7 +333,7 @@ impl SettingsUI {
     /// Load settings from storage
     pub fn load() -> Self {
         let settings_path = Self::get_settings_path();
-        
+
         if settings_path.exists() {
             match horizon_storage::settings::Settings::load(&settings_path) {
                 Ok(storage_settings) => {
@@ -427,7 +431,7 @@ impl SettingsUI {
     pub fn save(&self) {
         let settings_path = Self::get_settings_path();
         let storage_settings = self.to_storage();
-        
+
         match storage_settings.save(&settings_path) {
             Ok(()) => {
                 tracing::info!("Settings saved successfully to {:?}", settings_path);

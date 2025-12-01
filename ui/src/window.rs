@@ -70,6 +70,8 @@ struct BrowserApp {
     tab_to_close: Option<usize>,
     /// Settings state
     settings: crate::settings::SettingsUI,
+    /// Sidebar state
+    sidebar: crate::sidebar::Sidebar,
 }
 
 impl BrowserApp {
@@ -78,29 +80,31 @@ impl BrowserApp {
         let tab_manager = TabManager::new();
         let url_input = tab_manager.active_tab().url.clone();
         let settings = crate::settings::SettingsUI::load();
+        let sidebar = crate::sidebar::Sidebar::new();
 
         Self {
             tab_manager,
             url_input,
             tab_to_close: None,
             settings,
+            sidebar,
         }
     }
 
     /// Process URL input and return a properly formatted URL
     fn process_url_input(&self, input: &str) -> String {
         let trimmed = input.trim();
-        
+
         // Check for special URLs
         if trimmed.starts_with("about:") {
             return trimmed.to_string();
         }
-        
+
         // Check for explicit protocol
         if trimmed.starts_with("http://") || trimmed.starts_with("https://") {
             return trimmed.to_string();
         }
-        
+
         // Check if it looks like a domain/URL:
         // - Contains at least one dot
         // - Doesn't contain spaces
@@ -115,165 +119,267 @@ impl BrowserApp {
                 }
             }
         }
-        
+
         // Treat as search query
         self.settings.general.search_engine.search_url(trimmed)
     }
 
-    /// Render the home page content
+    /// Render the home page content with enhanced dashboard
     fn render_home_page(&self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
-            ui.add_space(80.0);
+            ui.add_space(60.0);
 
-            // Horizon logo/title
+            // Branded Horizon header with gradient-style colors
             ui.heading(
-                egui::RichText::new("🌅 Horizon Browser")
-                    .size(56.0)
+                egui::RichText::new("🌅 Horizon")
+                    .size(64.0)
                     .strong()
-                    .color(egui::Color32::from_rgb(88, 166, 255)),
+                    .color(egui::Color32::from_rgb(0, 191, 255)), // Neon blue
             );
 
-            ui.add_space(16.0);
+            ui.add_space(12.0);
 
             ui.label(
-                egui::RichText::new("A Lightweight, Privacy-Focused Web Browser")
-                    .size(18.0)
-                    .color(egui::Color32::from_rgb(230, 237, 243)),
+                egui::RichText::new("Modern, Privacy-Focused Web Browser")
+                    .size(20.0)
+                    .color(egui::Color32::from_rgb(160, 32, 240)), // Neon purple accent
             );
+
+            ui.add_space(40.0);
+
+            // Central search bar
+            ui.horizontal(|ui| {
+                ui.add_space((ui.available_width() - 600.0) / 2.0);
+
+                egui::Frame::none()
+                    .fill(egui::Color32::from_rgba_premultiplied(22, 27, 34, 200))
+                    .stroke(egui::Stroke::new(2.0, egui::Color32::from_rgb(0, 191, 255)))
+                    .inner_margin(egui::Margin::symmetric(16.0, 12.0))
+                    .rounding(egui::Rounding::same(8.0))
+                    .show(ui, |ui| {
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new("🔍").size(20.0));
+                            ui.add_space(8.0);
+                            let mut search_text = String::new();
+                            ui.add(
+                                egui::TextEdit::singleline(&mut search_text)
+                                    .desired_width(520.0)
+                                    .hint_text("Search the web...")
+                                    .frame(false),
+                            );
+                        });
+                    });
+            });
 
             ui.add_space(50.0);
 
-            // Quick actions row
+            // App shortcut cards grid
             ui.horizontal(|ui| {
-                ui.add_space(200.0);
+                ui.add_space((ui.available_width() - 740.0) / 2.0);
 
-                // Quick links button
-                egui::Frame::none()
-                    .fill(egui::Color32::from_rgb(22, 27, 34))
-                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
-                    .inner_margin(egui::Margin::same(20.0))
-                    .rounding(egui::Rounding::same(8.0))
-                    .show(ui, |ui| {
-                        ui.vertical_centered(|ui| {
-                            ui.label(egui::RichText::new("🔖").size(40.0));
-                            ui.add_space(8.0);
-                            ui.label(egui::RichText::new("Quick Links").size(16.0).strong());
-                            ui.add_space(4.0);
-                            ui.label(
-                                egui::RichText::new("Coming soon")
-                                    .size(12.0)
-                                    .color(egui::Color32::from_rgb(125, 140, 160)),
-                            );
-                        });
-                    });
+                // Designer card
+                self.render_app_card(ui, "🎨", "Designer", "Creative tools");
+                ui.add_space(20.0);
 
-                ui.add_space(30.0);
+                // Complex Shader card
+                self.render_app_card(ui, "✨", "Complex Shader", "GPU rendering");
+                ui.add_space(20.0);
 
-                // Recent tabs button
-                egui::Frame::none()
-                    .fill(egui::Color32::from_rgb(22, 27, 34))
-                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
-                    .inner_margin(egui::Margin::same(20.0))
-                    .rounding(egui::Rounding::same(8.0))
-                    .show(ui, |ui| {
-                        ui.vertical_centered(|ui| {
-                            ui.label(egui::RichText::new("🕐").size(40.0));
-                            ui.add_space(8.0);
-                            ui.label(egui::RichText::new("Recent").size(16.0).strong());
-                            ui.add_space(4.0);
-                            ui.label(
-                                egui::RichText::new("Coming soon")
-                                    .size(12.0)
-                                    .color(egui::Color32::from_rgb(125, 140, 160)),
-                            );
-                        });
-                    });
-
-                ui.add_space(30.0);
-
-                // Bookmarks button
-                egui::Frame::none()
-                    .fill(egui::Color32::from_rgb(22, 27, 34))
-                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
-                    .inner_margin(egui::Margin::same(20.0))
-                    .rounding(egui::Rounding::same(8.0))
-                    .show(ui, |ui| {
-                        ui.vertical_centered(|ui| {
-                            ui.label(egui::RichText::new("⭐").size(40.0));
-                            ui.add_space(8.0);
-                            ui.label(egui::RichText::new("Bookmarks").size(16.0).strong());
-                            ui.add_space(4.0);
-                            ui.label(
-                                egui::RichText::new("Coming soon")
-                                    .size(12.0)
-                                    .color(egui::Color32::from_rgb(125, 140, 160)),
-                            );
-                        });
-                    });
+                // News card
+                self.render_app_card(ui, "📰", "News", "Latest updates");
             });
 
-            ui.add_space(60.0);
+            ui.add_space(40.0);
 
-            // Features grid
+            // Two column layout for widgets
             ui.horizontal(|ui| {
-                ui.add_space(150.0);
+                ui.add_space((ui.available_width() - 740.0) / 2.0);
 
-                // Feature 1
+                // Left column: Weather widget
                 ui.vertical(|ui| {
-                    ui.label(egui::RichText::new("🔒").size(36.0));
-                    ui.add_space(8.0);
-                    ui.label(egui::RichText::new("Privacy First").size(16.0).strong());
-                    ui.add_space(4.0);
-                    ui.label(
-                        egui::RichText::new("Built-in tracking\nprotection")
-                            .size(13.0)
-                            .color(egui::Color32::from_rgb(125, 140, 160)),
-                    );
+                    self.render_weather_widget(ui);
                 });
 
-                ui.add_space(80.0);
+                ui.add_space(20.0);
 
-                // Feature 2
+                // Right column: News feed
                 ui.vertical(|ui| {
-                    ui.label(egui::RichText::new("⚡").size(36.0));
-                    ui.add_space(8.0);
-                    ui.label(
-                        egui::RichText::new("Fast & Lightweight")
-                            .size(16.0)
-                            .strong(),
-                    );
-                    ui.add_space(4.0);
-                    ui.label(
-                        egui::RichText::new("Minimal resource\nusage")
-                            .size(13.0)
-                            .color(egui::Color32::from_rgb(125, 140, 160)),
-                    );
-                });
-
-                ui.add_space(80.0);
-
-                // Feature 3
-                ui.vertical(|ui| {
-                    ui.label(egui::RichText::new("🎨").size(36.0));
-                    ui.add_space(8.0);
-                    ui.label(egui::RichText::new("Modern UI").size(16.0).strong());
-                    ui.add_space(4.0);
-                    ui.label(
-                        egui::RichText::new("Clean dark theme\ninterface")
-                            .size(13.0)
-                            .color(egui::Color32::from_rgb(125, 140, 160)),
-                    );
+                    self.render_news_feed(ui);
                 });
             });
 
-            ui.add_space(80.0);
+            ui.add_space(50.0);
 
-            ui.label(
-                egui::RichText::new("Enter a URL in the address bar to start browsing")
-                    .size(14.0)
-                    .color(egui::Color32::from_rgb(125, 140, 160)),
-            );
+            // Social media icons
+            ui.horizontal(|ui| {
+                ui.add_space((ui.available_width() - 200.0) / 2.0);
+
+                ui.label(
+                    egui::RichText::new("Connect:")
+                        .size(14.0)
+                        .color(egui::Color32::from_rgb(125, 140, 160)),
+                );
+                ui.add_space(10.0);
+
+                if ui.button(egui::RichText::new("📘").size(20.0)).clicked() {
+                    tracing::info!("Facebook link clicked");
+                }
+                ui.add_space(8.0);
+
+                if ui.button(egui::RichText::new("📷").size(20.0)).clicked() {
+                    tracing::info!("Instagram link clicked");
+                }
+                ui.add_space(8.0);
+
+                if ui.button(egui::RichText::new("🐦").size(20.0)).clicked() {
+                    tracing::info!("Twitter link clicked");
+                }
+            });
+
+            ui.add_space(40.0);
         });
+    }
+
+    /// Render an app shortcut card
+    fn render_app_card(&self, ui: &mut egui::Ui, icon: &str, title: &str, subtitle: &str) {
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(30, 30, 30))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .inner_margin(egui::Margin::same(20.0))
+            .rounding(egui::Rounding::same(8.0))
+            .show(ui, |ui| {
+                ui.set_width(220.0);
+                ui.vertical_centered(|ui| {
+                    ui.label(egui::RichText::new(icon).size(48.0));
+                    ui.add_space(12.0);
+                    ui.label(
+                        egui::RichText::new(title)
+                            .size(18.0)
+                            .strong()
+                            .color(egui::Color32::from_rgb(230, 237, 243)),
+                    );
+                    ui.add_space(4.0);
+                    ui.label(
+                        egui::RichText::new(subtitle)
+                            .size(13.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
+                });
+            });
+    }
+
+    /// Render weather widget
+    fn render_weather_widget(&self, ui: &mut egui::Ui) {
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(30, 30, 30))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .inner_margin(egui::Margin::same(16.0))
+            .rounding(egui::Rounding::same(8.0))
+            .show(ui, |ui| {
+                ui.set_width(360.0);
+                ui.heading(
+                    egui::RichText::new("🌤 Weather")
+                        .size(18.0)
+                        .color(egui::Color32::from_rgb(230, 237, 243)),
+                );
+                ui.add_space(12.0);
+
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new("☀️").size(40.0));
+                    ui.add_space(12.0);
+                    ui.vertical(|ui| {
+                        ui.label(
+                            egui::RichText::new("72°F / 22°C")
+                                .size(24.0)
+                                .strong()
+                                .color(egui::Color32::from_rgb(230, 237, 243)),
+                        );
+                        ui.label(
+                            egui::RichText::new("Sunny")
+                                .size(14.0)
+                                .color(egui::Color32::from_rgb(125, 140, 160)),
+                        );
+                    });
+                });
+
+                ui.add_space(10.0);
+                ui.separator();
+                ui.add_space(8.0);
+
+                ui.horizontal(|ui| {
+                    ui.label(
+                        egui::RichText::new("💧 Humidity:")
+                            .size(13.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
+                    ui.add_space(8.0);
+                    ui.label(
+                        egui::RichText::new("45%")
+                            .size(13.0)
+                            .color(egui::Color32::from_rgb(230, 237, 243)),
+                    );
+                });
+            });
+    }
+
+    /// Render news feed widget
+    fn render_news_feed(&self, ui: &mut egui::Ui) {
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(30, 30, 30))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .inner_margin(egui::Margin::same(16.0))
+            .rounding(egui::Rounding::same(8.0))
+            .show(ui, |ui| {
+                ui.set_width(360.0);
+                ui.heading(
+                    egui::RichText::new("📰 Latest News")
+                        .size(18.0)
+                        .color(egui::Color32::from_rgb(230, 237, 243)),
+                );
+                ui.add_space(12.0);
+
+                // News item 1
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new("📷").size(24.0));
+                    ui.add_space(8.0);
+                    ui.vertical(|ui| {
+                        ui.label(
+                            egui::RichText::new("Horizon Browser v0.0.1 Released")
+                                .size(14.0)
+                                .strong()
+                                .color(egui::Color32::from_rgb(230, 237, 243)),
+                        );
+                        ui.label(
+                            egui::RichText::new("New UI design with modern features")
+                                .size(12.0)
+                                .color(egui::Color32::from_rgb(125, 140, 160)),
+                        );
+                    });
+                });
+
+                ui.add_space(10.0);
+                ui.separator();
+                ui.add_space(10.0);
+
+                // News item 2
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new("🔒").size(24.0));
+                    ui.add_space(8.0);
+                    ui.vertical(|ui| {
+                        ui.label(
+                            egui::RichText::new("Enhanced Privacy Features")
+                                .size(14.0)
+                                .strong()
+                                .color(egui::Color32::from_rgb(230, 237, 243)),
+                        );
+                        ui.label(
+                            egui::RichText::new("Better tracking protection added")
+                                .size(12.0)
+                                .color(egui::Color32::from_rgb(125, 140, 160)),
+                        );
+                    });
+                });
+            });
     }
 
     /// Render a blank page
@@ -356,191 +462,290 @@ impl BrowserApp {
         }
     }
 
-    /// Render the settings page
+    /// Render the settings page with modern layout
     fn render_settings_page(&mut self, ui: &mut egui::Ui) {
-        ui.horizontal(|ui| {
-            // Left sidebar for settings navigation
-            egui::SidePanel::left("settings_sidebar")
-                .default_width(200.0)
-                .resizable(false)
-                .frame(
-                    egui::Frame::none()
-                        .fill(egui::Color32::from_rgb(22, 27, 34))
-                        .inner_margin(egui::Margin::same(16.0)),
-                )
-                .show_inside(ui, |ui| {
+        ui.vertical(|ui| {
+            // Top banner with Horizon branding
+            egui::Frame::none()
+                .fill(egui::Color32::from_rgb(34, 34, 34))
+                .inner_margin(egui::Margin::symmetric(20.0, 16.0))
+                .show(ui, |ui| {
                     ui.heading(
-                        egui::RichText::new("⚙ Settings")
-                            .size(20.0)
-                            .color(egui::Color32::from_rgb(230, 237, 243)),
+                        egui::RichText::new("🌅 Horizon Settings")
+                            .size(28.0)
+                            .strong()
+                            .color(egui::Color32::from_rgb(0, 191, 255)),
                     );
-
-                    ui.add_space(20.0);
-
-                    // Settings navigation buttons
-                    let selected = &mut self.settings.selected_panel;
-
-                    if ui
-                        .selectable_label(
-                            *selected == crate::settings::SettingsPanel::General,
-                            "🏠 General",
-                        )
-                        .clicked()
-                    {
-                        *selected = crate::settings::SettingsPanel::General;
-                    }
-
-                    if ui
-                        .selectable_label(
-                            *selected == crate::settings::SettingsPanel::Privacy,
-                            "🔒 Privacy",
-                        )
-                        .clicked()
-                    {
-                        *selected = crate::settings::SettingsPanel::Privacy;
-                    }
-
-                    if ui
-                        .selectable_label(
-                            *selected == crate::settings::SettingsPanel::Appearance,
-                            "🎨 Appearance",
-                        )
-                        .clicked()
-                    {
-                        *selected = crate::settings::SettingsPanel::Appearance;
-                    }
-
-                    if ui
-                        .selectable_label(
-                            *selected == crate::settings::SettingsPanel::Network,
-                            "🌐 Network & VPN",
-                        )
-                        .clicked()
-                    {
-                        *selected = crate::settings::SettingsPanel::Network;
-                    }
-
-                    if ui
-                        .selectable_label(
-                            *selected == crate::settings::SettingsPanel::Passwords,
-                            "🔑 Passwords",
-                        )
-                        .clicked()
-                    {
-                        *selected = crate::settings::SettingsPanel::Passwords;
-                    }
-
-                    if ui
-                        .selectable_label(
-                            *selected == crate::settings::SettingsPanel::Extensions,
-                            "🧩 Extensions",
-                        )
-                        .clicked()
-                    {
-                        *selected = crate::settings::SettingsPanel::Extensions;
-                    }
-
-                    if ui
-                        .selectable_label(
-                            *selected == crate::settings::SettingsPanel::Downloads,
-                            "📥 Downloads",
-                        )
-                        .clicked()
-                    {
-                        *selected = crate::settings::SettingsPanel::Downloads;
-                    }
-
-                    if ui
-                        .selectable_label(
-                            *selected == crate::settings::SettingsPanel::Advanced,
-                            "🔧 Advanced",
-                        )
-                        .clicked()
-                    {
-                        *selected = crate::settings::SettingsPanel::Advanced;
-                    }
+                    ui.add_space(4.0);
+                    ui.label(
+                        egui::RichText::new("Configure your browser experience")
+                            .size(14.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
                 });
 
-            // Right panel for settings content
-            ui.vertical(|ui| {
-                ui.add_space(20.0);
+            ui.add_space(10.0);
 
-                egui::ScrollArea::vertical()
-                    .auto_shrink([false; 2])
-                    .show(ui, |ui| {
+            ui.horizontal(|ui| {
+                // Left sidebar for settings navigation with modern styling
+                egui::SidePanel::left("settings_sidebar")
+                    .default_width(220.0)
+                    .resizable(false)
+                    .frame(
+                        egui::Frame::none()
+                            .fill(egui::Color32::from_rgb(34, 34, 34))
+                            .inner_margin(egui::Margin::same(16.0)),
+                    )
+                    .show_inside(ui, |ui| {
                         ui.add_space(10.0);
 
-                        match self.settings.selected_panel {
-                            crate::settings::SettingsPanel::General => {
-                                self.render_general_settings(ui);
-                            }
-                            crate::settings::SettingsPanel::Privacy => {
-                                self.render_privacy_settings(ui);
-                            }
-                            crate::settings::SettingsPanel::Appearance => {
-                                self.render_appearance_settings(ui);
-                            }
-                            crate::settings::SettingsPanel::Network => {
-                                self.render_network_settings(ui);
-                            }
-                            crate::settings::SettingsPanel::Passwords => {
-                                self.render_passwords_settings(ui);
-                            }
-                            crate::settings::SettingsPanel::Extensions => {
-                                self.render_extensions_settings(ui);
-                            }
-                            crate::settings::SettingsPanel::Downloads => {
-                                self.render_downloads_settings(ui);
-                            }
-                            crate::settings::SettingsPanel::Advanced => {
-                                self.render_advanced_settings(ui);
-                            }
-                        }
+                        // Settings navigation buttons with modern styling
+                        let selected = &mut self.settings.selected_panel;
 
-                        ui.add_space(20.0);
-
-                        // Save button
-                        ui.horizontal(|ui| {
-                            if ui.button("💾 Save Settings").clicked() {
-                                self.settings.save();
-                            }
-                        });
+                        Self::render_settings_nav_item(
+                            ui,
+                            selected,
+                            crate::settings::SettingsPanel::General,
+                            "🏠",
+                            "General",
+                        );
+                        Self::render_settings_nav_item(
+                            ui,
+                            selected,
+                            crate::settings::SettingsPanel::Privacy,
+                            "🔒",
+                            "Privacy",
+                        );
+                        Self::render_settings_nav_item(
+                            ui,
+                            selected,
+                            crate::settings::SettingsPanel::Appearance,
+                            "🎨",
+                            "Appearance",
+                        );
+                        Self::render_settings_nav_item(
+                            ui,
+                            selected,
+                            crate::settings::SettingsPanel::Network,
+                            "🌐",
+                            "Network & VPN",
+                        );
+                        Self::render_settings_nav_item(
+                            ui,
+                            selected,
+                            crate::settings::SettingsPanel::Passwords,
+                            "🔑",
+                            "Passwords",
+                        );
+                        Self::render_settings_nav_item(
+                            ui,
+                            selected,
+                            crate::settings::SettingsPanel::Extensions,
+                            "🧩",
+                            "Extensions",
+                        );
+                        Self::render_settings_nav_item(
+                            ui,
+                            selected,
+                            crate::settings::SettingsPanel::Downloads,
+                            "📥",
+                            "Downloads",
+                        );
+                        Self::render_settings_nav_item(
+                            ui,
+                            selected,
+                            crate::settings::SettingsPanel::Advanced,
+                            "🔧",
+                            "Advanced",
+                        );
                     });
+
+                // Right panel for settings content with modern styling
+                ui.vertical(|ui| {
+                    egui::ScrollArea::vertical()
+                        .auto_shrink([false; 2])
+                        .show(ui, |ui| {
+                            ui.add_space(20.0);
+
+                            // Content area with padding
+                            ui.horizontal(|ui| {
+                                ui.add_space(20.0);
+                                ui.vertical(|ui| {
+                                    ui.set_max_width(700.0);
+
+                                    match self.settings.selected_panel {
+                                        crate::settings::SettingsPanel::General => {
+                                            self.render_general_settings(ui);
+                                        }
+                                        crate::settings::SettingsPanel::Privacy => {
+                                            self.render_privacy_settings(ui);
+                                        }
+                                        crate::settings::SettingsPanel::Appearance => {
+                                            self.render_appearance_settings(ui);
+                                        }
+                                        crate::settings::SettingsPanel::Network => {
+                                            self.render_network_settings(ui);
+                                        }
+                                        crate::settings::SettingsPanel::Passwords => {
+                                            self.render_passwords_settings(ui);
+                                        }
+                                        crate::settings::SettingsPanel::Extensions => {
+                                            self.render_extensions_settings(ui);
+                                        }
+                                        crate::settings::SettingsPanel::Downloads => {
+                                            self.render_downloads_settings(ui);
+                                        }
+                                        crate::settings::SettingsPanel::Advanced => {
+                                            self.render_advanced_settings(ui);
+                                        }
+                                    }
+
+                                    ui.add_space(30.0);
+
+                                    // Save button with modern styling
+                                    ui.horizontal(|ui| {
+                                        if ui
+                                            .add(
+                                                egui::Button::new(
+                                                    egui::RichText::new("💾 Save Settings")
+                                                        .size(16.0),
+                                                )
+                                                .fill(egui::Color32::from_rgb(0, 191, 255))
+                                                .rounding(egui::Rounding::same(8.0))
+                                                .min_size(egui::vec2(150.0, 40.0)),
+                                            )
+                                            .clicked()
+                                        {
+                                            self.settings.save();
+                                        }
+                                    });
+                                });
+                            });
+                        });
+                });
             });
         });
     }
 
-    /// Render general settings panel
+    /// Render a settings navigation item with modern styling
+    fn render_settings_nav_item(
+        ui: &mut egui::Ui,
+        selected: &mut crate::settings::SettingsPanel,
+        panel: crate::settings::SettingsPanel,
+        icon: &str,
+        label: &str,
+    ) {
+        let is_selected = *selected == panel;
+
+        let button =
+            egui::Button::new(egui::RichText::new(format!("{} {}", icon, label)).size(15.0))
+                .fill(if is_selected {
+                    egui::Color32::from_rgb(42, 42, 42)
+                } else {
+                    egui::Color32::TRANSPARENT
+                })
+                .stroke(if is_selected {
+                    egui::Stroke::new(2.0, egui::Color32::from_rgb(0, 191, 255))
+                } else {
+                    egui::Stroke::NONE
+                })
+                .rounding(egui::Rounding::same(8.0));
+
+        if ui.add_sized([ui.available_width(), 36.0], button).clicked() {
+            *selected = panel;
+        }
+
+        ui.add_space(4.0);
+    }
+
+    /// Render general settings panel with modern styling
     fn render_general_settings(&mut self, ui: &mut egui::Ui) {
         ui.heading(
             egui::RichText::new("General Settings")
-                .size(18.0)
+                .size(24.0)
+                .strong()
                 .color(egui::Color32::from_rgb(230, 237, 243)),
         );
-        ui.add_space(10.0);
+        ui.add_space(8.0);
+        ui.separator();
+        ui.add_space(20.0);
 
-        ui.label("Homepage URL:");
-        ui.text_edit_singleline(&mut self.settings.general.homepage);
-        ui.add_space(10.0);
-
-        ui.label("Default Search Engine:");
-        egui::ComboBox::from_label("")
-            .selected_text(self.settings.general.search_engine.name())
-            .show_ui(ui, |ui| {
-                for engine in crate::settings::SearchEngine::all() {
-                    ui.selectable_value(
-                        &mut self.settings.general.search_engine,
-                        *engine,
-                        engine.name(),
-                    );
-                }
+        // Settings section
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(34, 34, 34))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .inner_margin(egui::Margin::same(20.0))
+            .rounding(egui::Rounding::same(8.0))
+            .show(ui, |ui| {
+                ui.label(
+                    egui::RichText::new("Homepage URL")
+                        .size(16.0)
+                        .strong()
+                        .color(egui::Color32::from_rgb(230, 237, 243)),
+                );
+                ui.add_space(8.0);
+                ui.text_edit_singleline(&mut self.settings.general.homepage);
+                ui.label(
+                    egui::RichText::new("The page that opens when you start the browser")
+                        .size(12.0)
+                        .color(egui::Color32::from_rgb(125, 140, 160)),
+                );
             });
-        ui.add_space(10.0);
 
-        ui.checkbox(
-            &mut self.settings.general.restore_tabs_on_startup,
-            "Restore tabs on startup",
-        );
+        ui.add_space(16.0);
+
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(34, 34, 34))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .inner_margin(egui::Margin::same(20.0))
+            .rounding(egui::Rounding::same(8.0))
+            .show(ui, |ui| {
+                ui.label(
+                    egui::RichText::new("Default Search Engine")
+                        .size(16.0)
+                        .strong()
+                        .color(egui::Color32::from_rgb(230, 237, 243)),
+                );
+                ui.add_space(8.0);
+                egui::ComboBox::from_label("")
+                    .selected_text(self.settings.general.search_engine.name())
+                    .show_ui(ui, |ui| {
+                        for engine in crate::settings::SearchEngine::all() {
+                            ui.selectable_value(
+                                &mut self.settings.general.search_engine,
+                                *engine,
+                                engine.name(),
+                            );
+                        }
+                    });
+                ui.label(
+                    egui::RichText::new("Choose your preferred search engine")
+                        .size(12.0)
+                        .color(egui::Color32::from_rgb(125, 140, 160)),
+                );
+            });
+
+        ui.add_space(16.0);
+
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(34, 34, 34))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .inner_margin(egui::Margin::same(20.0))
+            .rounding(egui::Rounding::same(8.0))
+            .show(ui, |ui| {
+                ui.checkbox(
+                    &mut self.settings.general.restore_tabs_on_startup,
+                    egui::RichText::new("Restore tabs on startup")
+                        .size(15.0)
+                        .color(egui::Color32::from_rgb(230, 237, 243)),
+                );
+                ui.add_space(4.0);
+                ui.label(
+                    egui::RichText::new("Reopen tabs from your last session")
+                        .size(12.0)
+                        .color(egui::Color32::from_rgb(125, 140, 160)),
+                );
+            });
     }
 
     /// Render privacy settings panel
@@ -604,37 +809,96 @@ impl BrowserApp {
         );
     }
 
-    /// Render appearance settings panel
+    /// Render appearance settings panel with modern styling
     fn render_appearance_settings(&mut self, ui: &mut egui::Ui) {
         ui.heading(
             egui::RichText::new("Appearance")
-                .size(18.0)
+                .size(24.0)
+                .strong()
                 .color(egui::Color32::from_rgb(230, 237, 243)),
         );
-        ui.add_space(10.0);
+        ui.add_space(8.0);
+        ui.separator();
+        ui.add_space(20.0);
 
-        ui.label("Theme:");
-        egui::ComboBox::from_label("")
-            .selected_text(self.settings.appearance.theme.name())
-            .show_ui(ui, |ui| {
-                for theme in crate::settings::Theme::all() {
-                    ui.selectable_value(
-                        &mut self.settings.appearance.theme,
-                        *theme,
-                        theme.name(),
-                    );
-                }
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(34, 34, 34))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .inner_margin(egui::Margin::same(20.0))
+            .rounding(egui::Rounding::same(8.0))
+            .show(ui, |ui| {
+                ui.label(
+                    egui::RichText::new("Theme")
+                        .size(16.0)
+                        .strong()
+                        .color(egui::Color32::from_rgb(230, 237, 243)),
+                );
+                ui.add_space(8.0);
+                egui::ComboBox::from_label("")
+                    .selected_text(self.settings.appearance.theme.name())
+                    .show_ui(ui, |ui| {
+                        for theme in crate::settings::Theme::all() {
+                            ui.selectable_value(
+                                &mut self.settings.appearance.theme,
+                                *theme,
+                                theme.name(),
+                            );
+                        }
+                    });
+                ui.label(
+                    egui::RichText::new("Switch between dark and light themes")
+                        .size(12.0)
+                        .color(egui::Color32::from_rgb(125, 140, 160)),
+                );
             });
-        ui.add_space(10.0);
 
-        ui.label("Font Size:");
-        ui.add(egui::Slider::new(&mut self.settings.appearance.font_size, 10..=20).suffix(" px"));
-        ui.add_space(10.0);
+        ui.add_space(16.0);
 
-        ui.checkbox(
-            &mut self.settings.appearance.show_bookmarks_bar,
-            "Show bookmarks bar",
-        );
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(34, 34, 34))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .inner_margin(egui::Margin::same(20.0))
+            .rounding(egui::Rounding::same(8.0))
+            .show(ui, |ui| {
+                ui.label(
+                    egui::RichText::new("Font Size")
+                        .size(16.0)
+                        .strong()
+                        .color(egui::Color32::from_rgb(230, 237, 243)),
+                );
+                ui.add_space(8.0);
+                ui.add(
+                    egui::Slider::new(&mut self.settings.appearance.font_size, 10..=20)
+                        .suffix(" px"),
+                );
+                ui.label(
+                    egui::RichText::new("Adjust the size of text in the browser")
+                        .size(12.0)
+                        .color(egui::Color32::from_rgb(125, 140, 160)),
+                );
+            });
+
+        ui.add_space(16.0);
+
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(34, 34, 34))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .inner_margin(egui::Margin::same(20.0))
+            .rounding(egui::Rounding::same(8.0))
+            .show(ui, |ui| {
+                ui.checkbox(
+                    &mut self.settings.appearance.show_bookmarks_bar,
+                    egui::RichText::new("Show bookmarks bar")
+                        .size(15.0)
+                        .color(egui::Color32::from_rgb(230, 237, 243)),
+                );
+                ui.add_space(4.0);
+                ui.label(
+                    egui::RichText::new("Display a toolbar with quick access to bookmarks")
+                        .size(12.0)
+                        .color(egui::Color32::from_rgb(125, 140, 160)),
+                );
+            });
     }
 
     /// Render downloads settings panel
@@ -778,7 +1042,10 @@ impl BrowserApp {
                     ui.add_space(5.0);
 
                     ui.label("Proxy Port:");
-                    ui.add(egui::Slider::new(&mut self.settings.network.proxy_port, 1..=65535));
+                    ui.add(egui::Slider::new(
+                        &mut self.settings.network.proxy_port,
+                        1..=65535,
+                    ));
                     ui.add_space(5.0);
                 }
                 crate::settings::VpnType::OpenVpn => {
@@ -799,7 +1066,11 @@ impl BrowserApp {
         ui.add_space(10.0);
 
         // Speed Test
-        ui.label(egui::RichText::new("Network Speed Test").size(16.0).strong());
+        ui.label(
+            egui::RichText::new("Network Speed Test")
+                .size(16.0)
+                .strong(),
+        );
         ui.add_space(5.0);
 
         if ui.button("🚀 Run Speed Test").clicked() {
@@ -822,11 +1093,7 @@ impl BrowserApp {
         );
         ui.add_space(10.0);
 
-        ui.label(
-            egui::RichText::new("Password Manager")
-                .size(16.0)
-                .strong(),
-        );
+        ui.label(egui::RichText::new("Password Manager").size(16.0).strong());
         ui.add_space(5.0);
 
         ui.label("Horizon Browser can securely save and autofill your passwords.");
@@ -917,7 +1184,7 @@ impl BrowserApp {
             if ui.button("➕ Install Extension").clicked() {
                 tracing::info!("Install extension requested");
             }
-            
+
             if ui.button("📦 Install from File").clicked() {
                 tracing::info!("Install from file requested");
             }
@@ -951,7 +1218,11 @@ impl BrowserApp {
         ui.add_space(15.0);
 
         // Extension settings
-        ui.label(egui::RichText::new("Extension Settings").size(16.0).strong());
+        ui.label(
+            egui::RichText::new("Extension Settings")
+                .size(16.0)
+                .strong(),
+        );
         ui.add_space(5.0);
 
         // Note: These are placeholder checkboxes for MVP. In full implementation,
@@ -983,18 +1254,29 @@ impl Default for BrowserApp {
 
 impl eframe::App for BrowserApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // Apply custom dark theme
+        // Apply custom modern dark theme with gradient-inspired colors
         let mut style = (*ctx.style()).clone();
         style.visuals = egui::Visuals::dark();
 
-        // Customize colors to match GitHub dark theme
-        style.visuals.widgets.noninteractive.bg_fill = egui::Color32::from_rgb(13, 17, 23);
-        style.visuals.widgets.inactive.bg_fill = egui::Color32::from_rgb(22, 27, 34);
-        style.visuals.widgets.hovered.bg_fill = egui::Color32::from_rgb(33, 38, 45);
-        style.visuals.widgets.active.bg_fill = egui::Color32::from_rgb(33, 38, 45);
-        style.visuals.extreme_bg_color = egui::Color32::from_rgb(13, 17, 23);
-        style.visuals.window_fill = egui::Color32::from_rgb(13, 17, 23);
-        style.visuals.panel_fill = egui::Color32::from_rgb(13, 17, 23);
+        // Customize colors to match modern dark theme with gradients (#1E1E1E to #2A2A2A)
+        style.visuals.widgets.noninteractive.bg_fill = egui::Color32::from_rgb(30, 30, 30);
+        style.visuals.widgets.inactive.bg_fill = egui::Color32::from_rgb(34, 34, 34);
+        style.visuals.widgets.hovered.bg_fill = egui::Color32::from_rgb(42, 42, 42);
+        style.visuals.widgets.active.bg_fill = egui::Color32::from_rgb(0, 191, 255); // Neon blue for active
+        style.visuals.extreme_bg_color = egui::Color32::from_rgb(30, 30, 30);
+        style.visuals.window_fill = egui::Color32::from_rgb(30, 30, 30);
+        style.visuals.panel_fill = egui::Color32::from_rgb(30, 30, 30);
+
+        // Set rounding to 8px for modern rounded corners
+        style.visuals.widgets.noninteractive.rounding = egui::Rounding::same(8.0);
+        style.visuals.widgets.inactive.rounding = egui::Rounding::same(8.0);
+        style.visuals.widgets.hovered.rounding = egui::Rounding::same(8.0);
+        style.visuals.widgets.active.rounding = egui::Rounding::same(8.0);
+
+        // Enhance selection colors with neon accents
+        style.visuals.selection.bg_fill = egui::Color32::from_rgba_premultiplied(0, 191, 255, 80);
+        style.visuals.selection.stroke =
+            egui::Stroke::new(1.0, egui::Color32::from_rgb(0, 191, 255));
 
         ctx.set_style(style);
 
@@ -1015,25 +1297,28 @@ impl eframe::App for BrowserApp {
             }
 
             // Ctrl+R or F5: Reload
-            if (i.modifiers.command && i.key_pressed(egui::Key::R))
-                || i.key_pressed(egui::Key::F5)
+            if (i.modifiers.command && i.key_pressed(egui::Key::R)) || i.key_pressed(egui::Key::F5)
             {
                 self.tab_manager.active_tab_mut().reload();
             }
 
             // Alt+Left: Back
-            if i.modifiers.alt && i.key_pressed(egui::Key::ArrowLeft)
-                && self.tab_manager.active_tab().can_go_back() {
-                    self.tab_manager.active_tab_mut().go_back();
-                    self.url_input = self.tab_manager.active_tab().url.clone();
-                }
+            if i.modifiers.alt
+                && i.key_pressed(egui::Key::ArrowLeft)
+                && self.tab_manager.active_tab().can_go_back()
+            {
+                self.tab_manager.active_tab_mut().go_back();
+                self.url_input = self.tab_manager.active_tab().url.clone();
+            }
 
             // Alt+Right: Forward
-            if i.modifiers.alt && i.key_pressed(egui::Key::ArrowRight)
-                && self.tab_manager.active_tab().can_go_forward() {
-                    self.tab_manager.active_tab_mut().go_forward();
-                    self.url_input = self.tab_manager.active_tab().url.clone();
-                }
+            if i.modifiers.alt
+                && i.key_pressed(egui::Key::ArrowRight)
+                && self.tab_manager.active_tab().can_go_forward()
+            {
+                self.tab_manager.active_tab_mut().go_forward();
+                self.url_input = self.tab_manager.active_tab().url.clone();
+            }
 
             // Alt+Home: Go to home
             if i.modifiers.alt && i.key_pressed(egui::Key::Home) {
@@ -1056,15 +1341,15 @@ impl eframe::App for BrowserApp {
             self.url_input = self.tab_manager.active_tab().url.clone();
         }
 
-        // Tab bar
+        // Tab bar with modern styling
         let mut switch_to_tab: Option<usize> = None;
         let mut new_tab_clicked = false;
 
         egui::TopBottomPanel::top("tab_bar")
             .frame(
                 egui::Frame::none()
-                    .fill(egui::Color32::from_rgb(22, 27, 34))
-                    .inner_margin(egui::Margin::symmetric(8.0, 4.0)),
+                    .fill(egui::Color32::from_rgb(34, 34, 34))
+                    .inner_margin(egui::Margin::symmetric(8.0, 6.0)),
             )
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
@@ -1074,22 +1359,27 @@ impl eframe::App for BrowserApp {
                     for (index, tab) in self.tab_manager.tabs().iter().enumerate() {
                         let is_active = index == active_index;
 
-                        let bg_color = if is_active {
-                            egui::Color32::from_rgb(13, 17, 23)
+                        // Pill-shaped tab styling with gradient-inspired colors
+                        let (bg_color, stroke_color) = if is_active {
+                            (
+                                egui::Color32::from_rgb(42, 42, 42),
+                                egui::Color32::from_rgb(0, 191, 255), // Neon blue border for active
+                            )
                         } else {
-                            egui::Color32::from_rgb(22, 27, 34)
+                            (
+                                egui::Color32::from_rgb(30, 30, 30),
+                                egui::Color32::from_rgb(48, 54, 61),
+                            )
                         };
 
                         egui::Frame::none()
                             .fill(bg_color)
-                            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
-                            .inner_margin(egui::Margin::symmetric(12.0, 6.0))
-                            .rounding(egui::Rounding {
-                                nw: 6.0,
-                                ne: 6.0,
-                                sw: 0.0,
-                                se: 0.0,
-                            })
+                            .stroke(egui::Stroke::new(
+                                if is_active { 2.0 } else { 1.0 },
+                                stroke_color,
+                            ))
+                            .inner_margin(egui::Margin::symmetric(14.0, 8.0))
+                            .rounding(egui::Rounding::same(8.0)) // Fully rounded pill shape
                             .show(ui, |ui| {
                                 ui.horizontal(|ui| {
                                     // Loading indicator
@@ -1184,19 +1474,116 @@ impl eframe::App for BrowserApp {
             self.url_input = "about:home".to_string();
         }
 
-        // Navigation bar
+        // Left sidebar navigation
+        let mut sidebar_action: Option<crate::sidebar::SidebarItem> = None;
+        let mut toggle_sidebar = false;
+
+        egui::SidePanel::left("sidebar")
+            .default_width(self.sidebar.effective_width())
+            .resizable(false)
+            .frame(
+                egui::Frame::none()
+                    .fill(egui::Color32::from_rgb(30, 30, 30))
+                    .inner_margin(egui::Margin::same(8.0)),
+            )
+            .show(ctx, |ui| {
+                ui.vertical(|ui| {
+                    ui.add_space(8.0);
+
+                    // Toggle sidebar button
+                    if ui
+                        .button(
+                            egui::RichText::new(if self.sidebar.collapsed { "☰" } else { "◀" })
+                                .size(18.0),
+                        )
+                        .on_hover_text("Toggle sidebar")
+                        .clicked()
+                    {
+                        toggle_sidebar = true;
+                    }
+
+                    ui.add_space(16.0);
+                    ui.separator();
+                    ui.add_space(16.0);
+
+                    // Sidebar items
+                    for item in crate::sidebar::SidebarItem::all() {
+                        let is_selected = self.sidebar.selected_item == Some(*item);
+
+                        let button_text = if self.sidebar.collapsed {
+                            egui::RichText::new(item.icon()).size(24.0)
+                        } else {
+                            egui::RichText::new(format!("{} {}", item.icon(), item.label()))
+                                .size(16.0)
+                        };
+
+                        let button = egui::Button::new(button_text)
+                            .fill(if is_selected {
+                                egui::Color32::from_rgb(42, 42, 42)
+                            } else {
+                                egui::Color32::from_rgb(30, 30, 30)
+                            })
+                            .stroke(if is_selected {
+                                egui::Stroke::new(2.0, egui::Color32::from_rgb(0, 191, 255))
+                            } else {
+                                egui::Stroke::NONE
+                            })
+                            .rounding(egui::Rounding::same(8.0));
+
+                        if ui
+                            .add_sized([ui.available_width(), 40.0], button)
+                            .on_hover_text(item.label())
+                            .clicked()
+                        {
+                            sidebar_action = Some(*item);
+                        }
+
+                        ui.add_space(4.0);
+                    }
+                });
+            });
+
+        // Handle sidebar actions
+        if toggle_sidebar {
+            self.sidebar.toggle_collapsed();
+        }
+
+        if let Some(item) = sidebar_action {
+            self.sidebar.select_item(item);
+            match item {
+                crate::sidebar::SidebarItem::Settings => {
+                    self.tab_manager
+                        .active_tab_mut()
+                        .navigate_to("about:settings");
+                    self.url_input = "about:settings".to_string();
+                }
+                crate::sidebar::SidebarItem::Search => {
+                    self.tab_manager.active_tab_mut().navigate_to("about:home");
+                    self.url_input = "about:home".to_string();
+                }
+                _ => {
+                    tracing::info!("Sidebar item {:?} clicked (not yet implemented)", item);
+                }
+            }
+        }
+
+        // Navigation bar with modern styling
         egui::TopBottomPanel::top("nav_bar")
             .frame(
                 egui::Frame::none()
-                    .fill(egui::Color32::from_rgb(22, 27, 34))
-                    .inner_margin(egui::Margin::symmetric(8.0, 8.0)),
+                    .fill(egui::Color32::from_rgb(34, 34, 34))
+                    .inner_margin(egui::Margin::symmetric(12.0, 10.0)),
             )
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
-                    // Back button
+                    // Navigation arrows
                     let can_go_back = self.tab_manager.active_tab().can_go_back();
                     if ui
-                        .add_enabled(can_go_back, egui::Button::new("◀"))
+                        .add_enabled(
+                            can_go_back,
+                            egui::Button::new(egui::RichText::new("◀").size(16.0))
+                                .rounding(egui::Rounding::same(6.0)),
+                        )
                         .on_hover_text("Go back (Alt+Left)")
                         .clicked()
                     {
@@ -1204,10 +1591,13 @@ impl eframe::App for BrowserApp {
                         self.url_input = self.tab_manager.active_tab().url.clone();
                     }
 
-                    // Forward button
                     let can_go_forward = self.tab_manager.active_tab().can_go_forward();
                     if ui
-                        .add_enabled(can_go_forward, egui::Button::new("▶"))
+                        .add_enabled(
+                            can_go_forward,
+                            egui::Button::new(egui::RichText::new("▶").size(16.0))
+                                .rounding(egui::Rounding::same(6.0)),
+                        )
                         .on_hover_text("Go forward (Alt+Right)")
                         .clicked()
                     {
@@ -1215,7 +1605,7 @@ impl eframe::App for BrowserApp {
                         self.url_input = self.tab_manager.active_tab().url.clone();
                     }
 
-                    // Reload button
+                    // Reload/Stop button
                     let is_loading = self.tab_manager.active_tab().is_loading;
                     let reload_text = if is_loading { "⏹" } else { "⟳" };
                     let reload_tooltip = if is_loading {
@@ -1224,7 +1614,11 @@ impl eframe::App for BrowserApp {
                         "Reload page (Ctrl+R)"
                     };
 
-                    if ui.add(egui::Button::new(reload_text))
+                    if ui
+                        .add(
+                            egui::Button::new(egui::RichText::new(reload_text).size(16.0))
+                                .rounding(egui::Rounding::same(6.0)),
+                        )
                         .on_hover_text(reload_tooltip)
                         .clicked()
                     {
@@ -1239,7 +1633,10 @@ impl eframe::App for BrowserApp {
 
                     // Home button
                     if ui
-                        .add(egui::Button::new("🏠"))
+                        .add(
+                            egui::Button::new(egui::RichText::new("🏠").size(16.0))
+                                .rounding(egui::Rounding::same(6.0)),
+                        )
                         .on_hover_text("Go to home page (Alt+Home)")
                         .clicked()
                     {
@@ -1249,62 +1646,93 @@ impl eframe::App for BrowserApp {
                         tracing::info!("Navigating to home");
                     }
 
-                    ui.add_space(8.0);
+                    ui.add_space(12.0);
 
-                    // SSL/Security indicator
+                    // SSL/Security lock icon
                     let current_url = &self.tab_manager.active_tab().url;
-                    let (security_icon, security_color, security_tooltip) = if current_url.starts_with("https://") {
-                        ("🔒", egui::Color32::from_rgb(63, 185, 80), "Secure connection (HTTPS)")
-                    } else if current_url.starts_with("http://") {
-                        ("⚠", egui::Color32::from_rgb(187, 128, 9), "Not secure (HTTP)")
-                    } else if current_url.starts_with("about:") {
-                        ("ℹ", egui::Color32::from_rgb(88, 166, 255), "Internal page")
-                    } else {
-                        ("🌐", egui::Color32::from_rgb(125, 140, 160), "Local or unknown")
-                    };
+                    let (security_icon, security_color, security_tooltip) =
+                        if current_url.starts_with("https://") {
+                            (
+                                "🔒",
+                                egui::Color32::from_rgb(63, 185, 80),
+                                "Secure connection (HTTPS)",
+                            )
+                        } else if current_url.starts_with("http://") {
+                            (
+                                "⚠",
+                                egui::Color32::from_rgb(187, 128, 9),
+                                "Not secure (HTTP)",
+                            )
+                        } else if current_url.starts_with("about:") {
+                            ("ℹ", egui::Color32::from_rgb(0, 191, 255), "Internal page")
+                        } else {
+                            (
+                                "🌐",
+                                egui::Color32::from_rgb(125, 140, 160),
+                                "Local or unknown",
+                            )
+                        };
 
                     ui.label(
                         egui::RichText::new(security_icon)
-                            .size(14.0)
-                            .color(security_color)
-                    ).on_hover_text(security_tooltip);
+                            .size(16.0)
+                            .color(security_color),
+                    )
+                    .on_hover_text(security_tooltip);
 
-                    ui.add_space(4.0);
+                    ui.add_space(6.0);
 
-                    // Address bar
-                    let response = ui.add(
+                    // Address bar with glassmorphism-inspired styling
+                    let address_bar_response = ui.add(
                         egui::TextEdit::singleline(&mut self.url_input)
-                            .desired_width(ui.available_width() - 140.0)
+                            .desired_width(ui.available_width() - 120.0)
                             .hint_text("Search or enter address...")
                             .frame(true),
                     );
 
                     // Navigate on Enter key
-                    if response.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
+                    if address_bar_response.lost_focus()
+                        && ui.input(|i| i.key_pressed(egui::Key::Enter))
+                    {
                         let url = self.process_url_input(&self.url_input);
                         self.tab_manager.active_tab_mut().navigate_to(&url);
                         self.url_input = url;
                         tracing::info!("Navigating to: {}", self.url_input);
                     }
 
-                    ui.add_space(4.0);
+                    ui.add_space(6.0);
 
-                    // Settings button
+                    // Bookmark/Star icon
                     if ui
-                        .add(egui::Button::new("⚙"))
-                        .on_hover_text("Settings")
+                        .add(
+                            egui::Button::new(egui::RichText::new("⭐").size(16.0))
+                                .rounding(egui::Rounding::same(6.0)),
+                        )
+                        .on_hover_text("Bookmark this page")
                         .clicked()
                     {
-                        self.tab_manager.active_tab_mut().navigate_to("about:settings");
-                        self.url_input = "about:settings".to_string();
-                        tracing::info!("Opening settings");
+                        tracing::info!("Bookmark clicked (not yet implemented)");
+                    }
+
+                    ui.add_space(4.0);
+
+                    // Profile/Avatar button
+                    if ui
+                        .add(
+                            egui::Button::new(egui::RichText::new("👤").size(16.0))
+                                .rounding(egui::Rounding::same(6.0)),
+                        )
+                        .on_hover_text("Profile")
+                        .clicked()
+                    {
+                        tracing::info!("Profile clicked (not yet implemented)");
                     }
                 });
             });
 
-        // Central panel for content
+        // Central panel for content with gradient-inspired background
         egui::CentralPanel::default()
-            .frame(egui::Frame::none().fill(egui::Color32::from_rgb(13, 17, 23)))
+            .frame(egui::Frame::none().fill(egui::Color32::from_rgb(30, 30, 30)))
             .show(ctx, |ui| {
                 egui::ScrollArea::vertical()
                     .auto_shrink([false; 2])
