@@ -217,7 +217,7 @@ impl BrowserApp {
                 ui.label(
                     egui::RichText::new("Connect:")
                         .size(14.0)
-                        .color(egui::Color32::from_rgb(125, 140, 160)),
+                        .color(egui::Color32::from_rgb(156, 163, 175)),
                 );
                 ui.add_space(10.0);
 
@@ -389,7 +389,7 @@ impl BrowserApp {
             ui.label(
                 egui::RichText::new("about:blank")
                     .size(24.0)
-                    .color(egui::Color32::from_rgb(125, 140, 160)),
+                    .color(egui::Color32::from_rgb(156, 163, 175)),
             );
         });
     }
@@ -410,13 +410,13 @@ impl BrowserApp {
 
                     ui.label(egui::RichText::new(format!("📄 {}", url))
                         .size(16.0)
-                        .color(egui::Color32::from_rgb(230, 237, 243)));
+                        .color(egui::Color32::from_rgb(249, 250, 251)));
 
                     ui.add_space(30.0);
 
                     ui.label(egui::RichText::new("This is a placeholder for web content.")
                         .size(14.0)
-                        .color(egui::Color32::from_rgb(125, 140, 160)));
+                        .color(egui::Color32::from_rgb(156, 163, 175)));
 
                     ui.add_space(10.0);
 
@@ -753,7 +753,7 @@ impl BrowserApp {
         ui.heading(
             egui::RichText::new("Privacy & Security")
                 .size(18.0)
-                .color(egui::Color32::from_rgb(230, 237, 243)),
+                .color(egui::Color32::from_rgb(249, 250, 251)),
         );
         ui.add_space(10.0);
 
@@ -764,7 +764,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Blocks known trackers from loading")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -772,7 +772,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Tells websites you don't want to be tracked")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -783,7 +783,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Prevents cross-site tracking")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -794,7 +794,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Only connect to secure HTTPS websites")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -805,7 +805,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Clears cookies, cache, and history when closing the browser")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
     }
 
@@ -906,7 +906,7 @@ impl BrowserApp {
         ui.heading(
             egui::RichText::new("Downloads")
                 .size(18.0)
-                .color(egui::Color32::from_rgb(230, 237, 243)),
+                .color(egui::Color32::from_rgb(249, 250, 251)),
         );
         ui.add_space(10.0);
 
@@ -925,7 +925,7 @@ impl BrowserApp {
         ui.heading(
             egui::RichText::new("Advanced")
                 .size(18.0)
-                .color(egui::Color32::from_rgb(230, 237, 243)),
+                .color(egui::Color32::from_rgb(249, 250, 251)),
         );
         ui.add_space(10.0);
 
@@ -936,7 +936,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Enables debugging and inspection features")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -947,7 +947,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Improves rendering performance")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -958,7 +958,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Try new features before they're officially released")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
     }
 
@@ -967,7 +967,7 @@ impl BrowserApp {
         ui.heading(
             egui::RichText::new("Network & VPN")
                 .size(18.0)
-                .color(egui::Color32::from_rgb(230, 237, 243)),
+                .color(egui::Color32::from_rgb(249, 250, 251)),
         );
         ui.add_space(10.0);
 
@@ -990,7 +990,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Changes take effect immediately")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -1000,7 +1000,7 @@ impl BrowserApp {
             ui.label(
                 egui::RichText::new("Example: 1.1.1.1, 8.8.8.8")
                     .size(12.0)
-                    .color(egui::Color32::from_rgb(125, 140, 160)),
+                    .color(egui::Color32::from_rgb(156, 163, 175)),
             );
             ui.add_space(8.0);
         }
@@ -1016,7 +1016,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Route all browser traffic through VPN")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -1080,7 +1080,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Test your connection's download/upload speed and latency")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
     }
 
@@ -1089,7 +1089,7 @@ impl BrowserApp {
         ui.heading(
             egui::RichText::new("Saved Passwords")
                 .size(18.0)
-                .color(egui::Color32::from_rgb(230, 237, 243)),
+                .color(egui::Color32::from_rgb(249, 250, 251)),
         );
         ui.add_space(10.0);
 
@@ -1118,13 +1118,13 @@ impl BrowserApp {
                     ui.label(
                         egui::RichText::new("No saved passwords yet")
                             .size(16.0)
-                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                            .color(egui::Color32::from_rgb(156, 163, 175)),
                     );
                     ui.add_space(5.0);
                     ui.label(
                         egui::RichText::new("Passwords will appear here when you save them")
                             .size(13.0)
-                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                            .color(egui::Color32::from_rgb(156, 163, 175)),
                     );
                 });
             });
@@ -1142,7 +1142,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Ask before saving passwords for websites (Coming soon)")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -1151,7 +1151,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Automatically fill in saved passwords (Coming soon)")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(10.0);
 
@@ -1165,7 +1165,7 @@ impl BrowserApp {
         ui.heading(
             egui::RichText::new("Extensions")
                 .size(18.0)
-                .color(egui::Color32::from_rgb(230, 237, 243)),
+                .color(egui::Color32::from_rgb(249, 250, 251)),
         );
         ui.add_space(10.0);
 
@@ -1204,13 +1204,13 @@ impl BrowserApp {
                     ui.label(
                         egui::RichText::new("No extensions installed")
                             .size(16.0)
-                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                            .color(egui::Color32::from_rgb(156, 163, 175)),
                     );
                     ui.add_space(5.0);
                     ui.label(
                         egui::RichText::new("Install extensions to enhance your browser")
                             .size(13.0)
-                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                            .color(egui::Color32::from_rgb(156, 163, 175)),
                     );
                 });
             });
@@ -1232,7 +1232,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Enable or disable all extensions (Coming soon)")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
         ui.add_space(8.0);
 
@@ -1241,7 +1241,7 @@ impl BrowserApp {
         ui.label(
             egui::RichText::new("Keep extensions up to date automatically (Coming soon)")
                 .size(12.0)
-                .color(egui::Color32::from_rgb(125, 140, 160)),
+                .color(egui::Color32::from_rgb(156, 163, 175)),
         );
     }
 }
