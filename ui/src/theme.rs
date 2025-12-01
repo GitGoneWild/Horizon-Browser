@@ -77,7 +77,7 @@ impl ColorPalette {
 
             // Status colors
             success: Color::new(34, 197, 94),         // #22C55E - Success/green
-            warning: Color::new(251, 191, 36),        // #FBC02D - Warning/yellow
+            warning: Color::new(251, 191, 36),        // #FBBF24 - Warning/yellow
             error: Color::new(248, 113, 113),         // #F87171 - Error/red
 
             // Borders
