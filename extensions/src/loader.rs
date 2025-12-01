@@ -46,8 +46,17 @@ impl ExtensionLoader {
         let manifest_content = std::fs::read_to_string(manifest_path)?;
         let manifest: super::manifest::Manifest = serde_json::from_str(&manifest_content)?;
 
-        tracing::info!("Loaded extension: {} ({})", manifest.name, manifest.id);
-        Ok(Some(manifest.id))
+        // Generate an ID if not provided in manifest
+        let ext_id = manifest.id.clone().unwrap_or_else(|| {
+            // Use directory name as fallback ID
+            path.file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("unknown")
+                .to_string()
+        });
+
+        tracing::info!("Loaded extension: {} ({})", manifest.name, ext_id);
+        Ok(Some(ext_id))
     }
 
     /// Get the extensions directory

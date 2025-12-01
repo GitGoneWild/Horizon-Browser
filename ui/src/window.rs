@@ -412,6 +412,36 @@ impl BrowserApp {
 
                     if ui
                         .selectable_label(
+                            *selected == crate::settings::SettingsPanel::Network,
+                            "🌐 Network & VPN",
+                        )
+                        .clicked()
+                    {
+                        *selected = crate::settings::SettingsPanel::Network;
+                    }
+
+                    if ui
+                        .selectable_label(
+                            *selected == crate::settings::SettingsPanel::Passwords,
+                            "🔑 Passwords",
+                        )
+                        .clicked()
+                    {
+                        *selected = crate::settings::SettingsPanel::Passwords;
+                    }
+
+                    if ui
+                        .selectable_label(
+                            *selected == crate::settings::SettingsPanel::Extensions,
+                            "🧩 Extensions",
+                        )
+                        .clicked()
+                    {
+                        *selected = crate::settings::SettingsPanel::Extensions;
+                    }
+
+                    if ui
+                        .selectable_label(
                             *selected == crate::settings::SettingsPanel::Downloads,
                             "📥 Downloads",
                         )
@@ -449,6 +479,15 @@ impl BrowserApp {
                             }
                             crate::settings::SettingsPanel::Appearance => {
                                 self.render_appearance_settings(ui);
+                            }
+                            crate::settings::SettingsPanel::Network => {
+                                self.render_network_settings(ui);
+                            }
+                            crate::settings::SettingsPanel::Passwords => {
+                                self.render_passwords_settings(ui);
+                            }
+                            crate::settings::SettingsPanel::Extensions => {
+                                self.render_extensions_settings(ui);
                             }
                             crate::settings::SettingsPanel::Downloads => {
                                 self.render_downloads_settings(ui);
@@ -654,6 +693,278 @@ impl BrowserApp {
         );
         ui.label(
             egui::RichText::new("Try new features before they're officially released")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+    }
+
+    /// Render network settings panel
+    fn render_network_settings(&mut self, ui: &mut egui::Ui) {
+        ui.heading(
+            egui::RichText::new("Network & VPN")
+                .size(18.0)
+                .color(egui::Color32::from_rgb(230, 237, 243)),
+        );
+        ui.add_space(10.0);
+
+        // DNS Settings
+        ui.label(egui::RichText::new("DNS Configuration").size(16.0).strong());
+        ui.add_space(5.0);
+
+        ui.label("DNS Provider:");
+        egui::ComboBox::from_label("")
+            .selected_text(self.settings.network.dns_provider.name())
+            .show_ui(ui, |ui| {
+                for provider in crate::settings::DnsProvider::all() {
+                    ui.selectable_value(
+                        &mut self.settings.network.dns_provider,
+                        *provider,
+                        provider.name(),
+                    );
+                }
+            });
+        ui.label(
+            egui::RichText::new("Changes take effect immediately")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        if self.settings.network.dns_provider == crate::settings::DnsProvider::Custom {
+            ui.label("Custom DNS Servers (comma-separated):");
+            ui.text_edit_singleline(&mut self.settings.network.custom_dns_servers);
+            ui.label(
+                egui::RichText::new("Example: 1.1.1.1, 8.8.8.8")
+                    .size(12.0)
+                    .color(egui::Color32::from_rgb(125, 140, 160)),
+            );
+            ui.add_space(8.0);
+        }
+
+        ui.separator();
+        ui.add_space(10.0);
+
+        // VPN Settings
+        ui.label(egui::RichText::new("VPN Configuration").size(16.0).strong());
+        ui.add_space(5.0);
+
+        ui.checkbox(&mut self.settings.network.vpn_enabled, "Enable VPN");
+        ui.label(
+            egui::RichText::new("Route all browser traffic through VPN")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        if self.settings.network.vpn_enabled {
+            ui.label("VPN Type:");
+            egui::ComboBox::from_label("")
+                .selected_text(self.settings.network.vpn_type.name())
+                .show_ui(ui, |ui| {
+                    for vpn_type in crate::settings::VpnType::all() {
+                        ui.selectable_value(
+                            &mut self.settings.network.vpn_type,
+                            *vpn_type,
+                            vpn_type.name(),
+                        );
+                    }
+                });
+            ui.add_space(8.0);
+
+            match self.settings.network.vpn_type {
+                crate::settings::VpnType::Proxy | crate::settings::VpnType::Socks5 => {
+                    ui.label("Proxy Host:");
+                    ui.text_edit_singleline(&mut self.settings.network.proxy_host);
+                    ui.add_space(5.0);
+
+                    ui.label("Proxy Port:");
+                    ui.add(egui::Slider::new(&mut self.settings.network.proxy_port, 1..=65535));
+                    ui.add_space(5.0);
+                }
+                crate::settings::VpnType::OpenVpn => {
+                    ui.label(
+                        egui::RichText::new("Upload .ovpn file to configure OpenVPN")
+                            .color(egui::Color32::from_rgb(88, 166, 255)),
+                    );
+                    if ui.button("📁 Select .ovpn File").clicked() {
+                        // File picker would be implemented here
+                        tracing::info!("OpenVPN file selection requested");
+                    }
+                }
+            }
+        }
+
+        ui.add_space(10.0);
+        ui.separator();
+        ui.add_space(10.0);
+
+        // Speed Test
+        ui.label(egui::RichText::new("Network Speed Test").size(16.0).strong());
+        ui.add_space(5.0);
+
+        if ui.button("🚀 Run Speed Test").clicked() {
+            tracing::info!("Speed test requested");
+            // Speed test would be triggered here
+        }
+        ui.label(
+            egui::RichText::new("Test your connection's download/upload speed and latency")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+    }
+
+    /// Render passwords settings panel
+    fn render_passwords_settings(&mut self, ui: &mut egui::Ui) {
+        ui.heading(
+            egui::RichText::new("Saved Passwords")
+                .size(18.0)
+                .color(egui::Color32::from_rgb(230, 237, 243)),
+        );
+        ui.add_space(10.0);
+
+        ui.label(
+            egui::RichText::new("Password Manager")
+                .size(16.0)
+                .strong(),
+        );
+        ui.add_space(5.0);
+
+        ui.label("Horizon Browser can securely save and autofill your passwords.");
+        ui.add_space(10.0);
+
+        // Search box
+        let mut search_query = String::new();
+        ui.label("Search passwords:");
+        ui.text_edit_singleline(&mut search_query);
+        ui.add_space(10.0);
+
+        // Password list (placeholder)
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(22, 27, 34))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
+            .inner_margin(egui::Margin::same(15.0))
+            .rounding(egui::Rounding::same(6.0))
+            .show(ui, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.label(egui::RichText::new("🔑").size(40.0));
+                    ui.add_space(10.0);
+                    ui.label(
+                        egui::RichText::new("No saved passwords yet")
+                            .size(16.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
+                    ui.add_space(5.0);
+                    ui.label(
+                        egui::RichText::new("Passwords will appear here when you save them")
+                            .size(13.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
+                });
+            });
+
+        ui.add_space(15.0);
+
+        // Password options
+        ui.label(egui::RichText::new("Options").size(16.0).strong());
+        ui.add_space(5.0);
+
+        let mut save_passwords = true;
+        ui.checkbox(&mut save_passwords, "Offer to save passwords");
+        ui.label(
+            egui::RichText::new("Ask before saving passwords for websites")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        let mut autofill_passwords = true;
+        ui.checkbox(&mut autofill_passwords, "Auto-fill passwords");
+        ui.label(
+            egui::RichText::new("Automatically fill in saved passwords")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(10.0);
+
+        if ui.button("🗑️ Clear All Passwords").clicked() {
+            tracing::warn!("Clear all passwords requested");
+        }
+    }
+
+    /// Render extensions settings panel
+    fn render_extensions_settings(&mut self, ui: &mut egui::Ui) {
+        ui.heading(
+            egui::RichText::new("Extensions")
+                .size(18.0)
+                .color(egui::Color32::from_rgb(230, 237, 243)),
+        );
+        ui.add_space(10.0);
+
+        ui.label(
+            egui::RichText::new("Manage Browser Extensions")
+                .size(16.0)
+                .strong(),
+        );
+        ui.add_space(5.0);
+
+        ui.label("Horizon Browser supports Firefox-compatible extensions.");
+        ui.add_space(10.0);
+
+        // Extension management buttons
+        ui.horizontal(|ui| {
+            if ui.button("➕ Install Extension").clicked() {
+                tracing::info!("Install extension requested");
+            }
+            
+            if ui.button("📦 Install from File").clicked() {
+                tracing::info!("Install from file requested");
+            }
+        });
+        ui.add_space(15.0);
+
+        // Installed extensions (placeholder)
+        egui::Frame::none()
+            .fill(egui::Color32::from_rgb(22, 27, 34))
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
+            .inner_margin(egui::Margin::same(15.0))
+            .rounding(egui::Rounding::same(6.0))
+            .show(ui, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.label(egui::RichText::new("🧩").size(40.0));
+                    ui.add_space(10.0);
+                    ui.label(
+                        egui::RichText::new("No extensions installed")
+                            .size(16.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
+                    ui.add_space(5.0);
+                    ui.label(
+                        egui::RichText::new("Install extensions to enhance your browser")
+                            .size(13.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
+                });
+            });
+
+        ui.add_space(15.0);
+
+        // Extension settings
+        ui.label(egui::RichText::new("Extension Settings").size(16.0).strong());
+        ui.add_space(5.0);
+
+        let mut allow_extensions = true;
+        ui.checkbox(&mut allow_extensions, "Allow extensions");
+        ui.label(
+            egui::RichText::new("Enable or disable all extensions")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        let mut extension_updates = true;
+        ui.checkbox(&mut extension_updates, "Automatic extension updates");
+        ui.label(
+            egui::RichText::new("Keep extensions up to date automatically")
                 .size(12.0)
                 .color(egui::Color32::from_rgb(125, 140, 160)),
         );
