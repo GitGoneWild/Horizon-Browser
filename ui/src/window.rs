@@ -832,9 +832,9 @@ impl BrowserApp {
         ui.label("Horizon Browser can securely save and autofill your passwords.");
         ui.add_space(10.0);
 
-        // Search box
+        // Search box (placeholder for MVP - will be connected to password manager in full implementation)
         let mut search_query = String::new();
-        ui.label("Search passwords:");
+        ui.label("Search passwords (Coming soon):");
         ui.text_edit_singleline(&mut search_query);
         ui.add_space(10.0);
 
@@ -868,10 +868,12 @@ impl BrowserApp {
         ui.label(egui::RichText::new("Options").size(16.0).strong());
         ui.add_space(5.0);
 
+        // Note: These are placeholder checkboxes for MVP. In full implementation,
+        // these would be connected to settings storage and password manager state.
         let mut save_passwords = true;
         ui.checkbox(&mut save_passwords, "Offer to save passwords");
         ui.label(
-            egui::RichText::new("Ask before saving passwords for websites")
+            egui::RichText::new("Ask before saving passwords for websites (Coming soon)")
                 .size(12.0)
                 .color(egui::Color32::from_rgb(125, 140, 160)),
         );
@@ -880,14 +882,14 @@ impl BrowserApp {
         let mut autofill_passwords = true;
         ui.checkbox(&mut autofill_passwords, "Auto-fill passwords");
         ui.label(
-            egui::RichText::new("Automatically fill in saved passwords")
+            egui::RichText::new("Automatically fill in saved passwords (Coming soon)")
                 .size(12.0)
                 .color(egui::Color32::from_rgb(125, 140, 160)),
         );
         ui.add_space(10.0);
 
         if ui.button("🗑️ Clear All Passwords").clicked() {
-            tracing::warn!("Clear all passwords requested");
+            tracing::warn!("Clear all passwords requested (not yet implemented)");
         }
     }
 
@@ -952,10 +954,12 @@ impl BrowserApp {
         ui.label(egui::RichText::new("Extension Settings").size(16.0).strong());
         ui.add_space(5.0);
 
+        // Note: These are placeholder checkboxes for MVP. In full implementation,
+        // these would be connected to extension manager state and settings storage.
         let mut allow_extensions = true;
         ui.checkbox(&mut allow_extensions, "Allow extensions");
         ui.label(
-            egui::RichText::new("Enable or disable all extensions")
+            egui::RichText::new("Enable or disable all extensions (Coming soon)")
                 .size(12.0)
                 .color(egui::Color32::from_rgb(125, 140, 160)),
         );
@@ -964,7 +968,7 @@ impl BrowserApp {
         let mut extension_updates = true;
         ui.checkbox(&mut extension_updates, "Automatic extension updates");
         ui.label(
-            egui::RichText::new("Keep extensions up to date automatically")
+            egui::RichText::new("Keep extensions up to date automatically (Coming soon)")
                 .size(12.0)
                 .color(egui::Color32::from_rgb(125, 140, 160)),
         );

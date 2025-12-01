@@ -5,9 +5,10 @@ use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
 
 /// DNS provider options
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum DnsProvider {
     /// Use system DNS resolver (default)
+    #[default]
     System,
     /// Google Public DNS (8.8.8.8, 8.8.4.4)
     Google,
@@ -63,30 +64,13 @@ impl DnsProvider {
     }
 }
 
-#[allow(clippy::derivable_impls)]
-impl Default for DnsProvider {
-    fn default() -> Self {
-        Self::System
-    }
-}
-
 /// DNS resolver configuration
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct DnsConfig {
     /// DNS provider to use
     pub provider: DnsProvider,
     /// Custom DNS servers (used when provider is Custom)
     pub custom_servers: Vec<IpAddr>,
-}
-
-#[allow(clippy::derivable_impls)]
-impl Default for DnsConfig {
-    fn default() -> Self {
-        Self {
-            provider: DnsProvider::default(),
-            custom_servers: Vec::new(),
-        }
-    }
 }
 
 /// DNS resolver with configurable providers
