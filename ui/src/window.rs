@@ -1247,10 +1247,30 @@ impl eframe::App for BrowserApp {
 
                     ui.add_space(8.0);
 
+                    // SSL/Security indicator
+                    let current_url = &self.tab_manager.active_tab().url;
+                    let (security_icon, security_color, security_tooltip) = if current_url.starts_with("https://") {
+                        ("🔒", egui::Color32::from_rgb(63, 185, 80), "Secure connection (HTTPS)")
+                    } else if current_url.starts_with("http://") {
+                        ("⚠", egui::Color32::from_rgb(187, 128, 9), "Not secure (HTTP)")
+                    } else if current_url.starts_with("about:") {
+                        ("ℹ", egui::Color32::from_rgb(88, 166, 255), "Internal page")
+                    } else {
+                        ("🌐", egui::Color32::from_rgb(125, 140, 160), "Local or unknown")
+                    };
+
+                    ui.label(
+                        egui::RichText::new(security_icon)
+                            .size(14.0)
+                            .color(security_color)
+                    ).on_hover_text(security_tooltip);
+
+                    ui.add_space(4.0);
+
                     // Address bar
                     let response = ui.add(
                         egui::TextEdit::singleline(&mut self.url_input)
-                            .desired_width(ui.available_width() - 120.0)
+                            .desired_width(ui.available_width() - 140.0)
                             .hint_text("Search or enter address...")
                             .frame(true),
                     );

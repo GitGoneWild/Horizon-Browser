@@ -1,200 +1,122 @@
-# Horizon Browser Features
+# Horizon Browser - Feature Documentation
 
 ## Overview
 
-Horizon Browser is a fully functional, modern desktop browser built in Rust with a focus on privacy, performance, and usability.
+Horizon Browser is a feature-rich, privacy-focused web browser built in Rust. This document provides detailed information about all available features.
 
 ## Core Features
 
-### 1. Tab Management
+### Multi-Tab Browsing
+- Create, close, and switch between tabs
+- Loading indicators for active tabs
+- Tab history with back/forward navigation
+- Keyboard shortcuts for tab management (Ctrl+T, Ctrl+W)
 
-- **Multiple Tabs**: Open and manage multiple browser tabs simultaneously
-- **Tab Creation**: Create new tabs with the ➕ button or navigate to URLs
-- **Tab Switching**: Click on any tab to switch to it
-- **Tab Closing**: Close individual tabs with the ✕ button (last tab cannot be closed)
-- **Visual Tab Bar**: Clean, modern tab bar showing all open tabs with truncated titles
+### Smart Address Bar
+- **SSL/Security Indicators**: Visual indicators for HTTPS (🔒), HTTP (⚠), and internal pages (ℹ)
+- **Intelligent URL Detection**: Automatically distinguishes between URLs and search queries
+- **Multiple Search Engines**: DuckDuckGo (default), Google, Bing, Brave Search
+- **URL Normalization**: Automatic HTTPS upgrade for domain entries
 
-### 2. Navigation
+### Privacy & Security
+- **Tracking Protection**: Blocks known trackers (enabled by default)
+- **Do Not Track**: Sends DNT header to websites (enabled by default)
+- **Third-Party Cookie Blocking**: Prevents cross-site tracking (enabled by default)
+- **HTTPS-Only Mode**: Optional enforcement of secure connections
+- **Clear Data on Exit**: Automatic cleanup when browser closes
 
-- **Address Bar**: Full-featured URL input with auto-protocol detection
-  - Supports `http://`, `https://`, and `about:` URLs
-  - Automatically adds `https://` for URLs with domains
-  - Treats non-URL input as DuckDuckGo search queries
-- **Back Button** (◀): Navigate backward in tab history
-- **Forward Button** (▶): Navigate forward in tab history
-- **Reload Button** (⟳): Refresh the current page
-- **Go Button**: Navigate to the entered URL
-- **Keyboard Support**: Press Enter in address bar to navigate
+### Network Features
 
-### 3. Navigation History
+#### DNS Control
+- System Default DNS
+- Google DNS (8.8.8.8, 8.8.4.4)
+- Cloudflare DNS (1.1.1.1, 1.0.0.1)
+- Quad9 DNS (9.9.9.9)
+- Custom DNS servers
+- Changes take effect immediately
 
-Each tab maintains its own navigation history:
-- URLs are added to history when navigating
-- Back/forward buttons are enabled/disabled based on history position
-- History is preserved when switching between tabs
+#### VPN Management
+- **HTTP/HTTPS Proxy Support**: Simple proxy configuration
+- **SOCKS5 Proxy**: Advanced proxy with authentication
+- **OpenVPN Support**: Full .ovpn file compatibility
+- Per-browser VPN (only browser traffic routed through VPN)
+- Real-time VPN statistics (coming soon)
 
-### 4. Default Home Page
+#### Network Speed Test
+- Download/upload speed measurement
+- Ping latency testing
+- Jitter calculation
+- Test server location display
+- Accessible from Network settings
 
-**about:home** - Beautiful welcome page featuring:
-- Horizon Browser branding with emoji logo 🌅
-- Welcome message
-- Feature highlights:
-  - 🔒 Privacy First: Built-in tracking protection
-  - ⚡ Fast & Lightweight: Minimal resource usage
-  - 🎨 Modern UI: Clean dark theme interface
-- User guidance for getting started
+### Password Management
+- Secure local password storage
+- Multiple accounts per website support
+- Password search functionality
+- Auto-fill suggestions (coming soon)
+- URL normalization for password matching
+- Master password protection (coming soon)
 
-**about:blank** - Simple blank page
+### Extension System
+- **Firefox WebExtensions Compatible**: Full Firefox extension API support
+- **Manifest v2 and v3**: Latest extension standards
+- **Background Scripts**: Extensions can run in the background
+- **Content Scripts**: Inject JavaScript into web pages
+- **Browser Actions**: Toolbar buttons for extensions
+- **Standard Permissions**: tabs, storage, bookmarks, cookies, webRequest, etc.
+- Install from repository or .xpi files
+- Automatic extension updates
 
-### 5. Web Page Rendering
+### Customization
+- **Themes**: Dark (default) and Light themes
+- **Font Size**: Adjustable from 10-20px
+- **Homepage**: Customizable start page
+- **Bookmarks Bar**: Toggle visibility
+- **Search Engine**: Choice of 4 search providers
 
-Currently displays placeholder content for web pages showing:
-- Page URL with emoji indicator 📄
-- Simulated web content in a styled frame
-- Information about full implementation plans
+### Advanced Features
+- **Developer Tools**: Coming soon (DOM inspection, console, network monitor)
+- **Hardware Acceleration**: GPU-accelerated rendering (enabled by default)
+- **Experimental Features**: Opt-in to test new features
 
-### 6. Modern Dark Theme UI
+## Keyboard Shortcuts
 
-GitHub-inspired dark theme with:
-- **Primary Background**: #0d1117 (GitHub dark)
-- **Secondary Background**: #161b22 (panels, tab bar)
-- **Tertiary Background**: #21262d (frames, borders)
-- **Accent Color**: #58a6ff (blue, links, highlights)
-- **Text Colors**: 
-  - Primary: #e6edf3 (bright white)
-  - Secondary: #7d8ca0 (muted)
-  - Muted: #57606a (subtle)
+- `Ctrl+T`: New tab
+- `Ctrl+W`: Close tab
+- `Ctrl+R` / `F5`: Reload page
+- `Alt+Left`: Go back
+- `Alt+Right`: Go forward
+- `Alt+Home`: Go to homepage
+- `Ctrl+L`: Focus address bar
 
-### 7. User Interface Components
+## Settings Panels
 
-#### Tab Bar
-- Shows all open tabs with titles
-- Active tab highlighted with lighter background
-- Inactive tabs in darker shade
-- Close button (✕) on each tab
-- New tab button (➕) at the end
-- Smooth hover effects
+1. **General**: Homepage, search engine, startup options
+2. **Privacy**: Tracking protection, DNT, cookies, HTTPS
+3. **Appearance**: Theme, font size, bookmarks bar
+4. **Network & VPN**: DNS, VPN, speed test
+5. **Passwords**: Password manager, auto-fill options
+6. **Extensions**: Extension management, permissions
+7. **Downloads**: Download directory, save preferences
+8. **Advanced**: Developer tools, hardware acceleration, experimental features
 
-#### Navigation Bar
-- Back/forward/reload navigation buttons
-- Full-width address bar with hint text
-- Go button for explicit navigation
-- Disabled state for unavailable actions
+## Special Pages
 
-#### Content Area
-- Scrollable content region
-- Full-height display
-- Responsive to window resizing
+- `about:home`: Browser home page
+- `about:settings`: Settings and preferences
+- `about:blank`: Blank page
 
-## Privacy Features
+## Platform Support
 
-As configured in the storage settings:
+- **Windows**: Windows 10 and later
+- **macOS**: macOS 10.15 (Catalina) and later
+- **Linux**: Most modern distributions
 
-- **Tracking Protection**: Enabled by default
-- **Do Not Track**: Enabled by default
-- **Third-Party Cookie Blocking**: Enabled by default
-- **Privacy-First Search**: Uses DuckDuckGo as default search engine
+## Privacy First
 
-## Cross-Platform Support
+- No telemetry or analytics
+- All data stored locally
+- Privacy features enabled by default
+- Open source and auditable
 
-Horizon Browser is built with cross-platform compatibility:
-
-- **Windows**: Native Windows support
-- **macOS**: Native macOS support
-- **Linux**: Native Linux support
-
-Uses `eframe` and `egui` for cross-platform GUI rendering.
-
-## Technical Architecture
-
-### Modular Design
-
-The browser is organized into specialized crates:
-
-1. **horizon-ui**: User interface and window management
-   - Tab management (`tabs.rs`)
-   - Window creation and layout (`window.rs`)
-   - Theme system (`theme.rs`)
-
-2. **horizon-engine**: Core rendering engine
-
-3. **horizon-storage**: Settings and data persistence
-
-4. **horizon-networking**: Network operations
-
-5. **horizon-extensions**: Extension framework
-
-6. **horizon-sandbox**: Security and isolation
-
-7. **horizon-launcher**: Main application entry point
-
-### Tab Management System
-
-The `TabManager` handles:
-- Creating and destroying tabs
-- Switching between tabs
-- Managing tab state and history
-- Preventing closure of last tab
-
-Each `Tab` contains:
-- Unique identifier (UUID)
-- Current URL
-- Page title
-- Navigation history stack
-- History position index
-- Loading state
-
-## Usage
-
-### Starting the Browser
-
-```bash
-cargo run --release
-```
-
-### Navigation
-
-1. **Open a URL**: Type or paste URL in address bar and press Enter or click Go
-2. **Search**: Type search terms (without domain) and press Enter
-3. **New Tab**: Click the ➕ button
-4. **Switch Tabs**: Click on any tab
-5. **Close Tab**: Click the ✕ on the tab
-6. **Go Back**: Click the ◀ button
-7. **Go Forward**: Click the ▶ button
-8. **Reload**: Click the ⟳ button
-
-### Special URLs
-
-- `about:home` - Home page with features and welcome
-- `about:blank` - Blank page
-- Regular URLs - Web page placeholder view
-
-## Future Enhancements
-
-Potential future features:
-
-1. Full web rendering engine integration (WebView or Servo)
-2. Bookmarks management
-3. Download manager
-4. Browser history persistence
-5. Extensions/plugins support
-6. Developer tools
-7. Settings UI
-8. Password manager
-9. Session restore
-10. Incognito mode
-
-## Testing
-
-Run the comprehensive test suite:
-
-```bash
-cargo test --workspace
-```
-
-All core functionality is tested including:
-- Tab creation and management
-- Navigation history
-- Tab switching and closing
-- UI components
-- Theme system
+For more information, see the full documentation in the [docs](.) directory.

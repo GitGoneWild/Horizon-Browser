@@ -63,6 +63,7 @@ impl DnsProvider {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for DnsProvider {
     fn default() -> Self {
         Self::System
@@ -78,6 +79,7 @@ pub struct DnsConfig {
     pub custom_servers: Vec<IpAddr>,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for DnsConfig {
     fn default() -> Self {
         Self {

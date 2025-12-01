@@ -122,7 +122,7 @@ impl PasswordManager {
         
         self.passwords
             .entry(normalized_url.clone())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(entry);
         
         self.modified = true;

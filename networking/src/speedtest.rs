@@ -81,7 +81,7 @@ impl Default for SpeedTestConfig {
             download_duration_secs: 10,
             upload_duration_secs: 10,
             download_size: 10 * 1024 * 1024, // 10 MB
-            upload_size: 1 * 1024 * 1024,    // 1 MB
+            upload_size: 1024 * 1024,    // 1 MB
         }
     }
 }
