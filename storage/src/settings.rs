@@ -6,23 +6,21 @@ use std::path::Path;
 
 /// Browser settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Settings {
     /// Privacy settings
-    #[serde(default)]
     pub privacy: PrivacySettings,
     /// Appearance settings
-    #[serde(default)]
     pub appearance: AppearanceSettings,
     /// General settings
-    #[serde(default)]
     pub general: GeneralSettings,
     /// Advanced settings
-    #[serde(default)]
     pub advanced: AdvancedSettings,
 }
 
 /// Privacy-related settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct PrivacySettings {
     /// Enable tracking protection
     pub tracking_protection: bool,
@@ -33,7 +31,6 @@ pub struct PrivacySettings {
     /// Block third-party cookies
     pub block_third_party_cookies: bool,
     /// Enable HTTPS-only mode
-    #[serde(default)]
     pub https_only: bool,
 }
 
@@ -51,6 +48,7 @@ impl Default for PrivacySettings {
 
 /// Appearance settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct AppearanceSettings {
     /// Current theme name
     pub theme: String,
@@ -72,6 +70,7 @@ impl Default for AppearanceSettings {
 
 /// General settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct GeneralSettings {
     /// Default homepage URL
     pub homepage: String,
@@ -110,6 +109,7 @@ impl Default for GeneralSettings {
 
 /// Advanced settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct AdvancedSettings {
     /// Enable developer tools
     pub enable_developer_tools: bool,
