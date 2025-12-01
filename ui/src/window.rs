@@ -89,17 +89,35 @@ impl BrowserApp {
 
     /// Process URL input and return a properly formatted URL
     fn process_url_input(&self, input: &str) -> String {
-        if input.starts_with("http://")
-            || input.starts_with("https://")
-            || input.starts_with("about:")
-        {
-            input.to_string()
-        } else if input.contains('.') && !input.contains(' ') {
-            format!("https://{}", input)
-        } else {
-            // Treat as search query
-            self.settings.general.search_engine.search_url(input)
+        let trimmed = input.trim();
+        
+        // Check for special URLs
+        if trimmed.starts_with("about:") {
+            return trimmed.to_string();
         }
+        
+        // Check for explicit protocol
+        if trimmed.starts_with("http://") || trimmed.starts_with("https://") {
+            return trimmed.to_string();
+        }
+        
+        // Check if it looks like a domain/URL:
+        // - Contains at least one dot
+        // - Doesn't contain spaces
+        // - Has a valid TLD-like pattern (at least 2 chars after last dot)
+        if trimmed.contains('.') && !trimmed.contains(' ') {
+            let parts: Vec<&str> = trimmed.split('.').collect();
+            if parts.len() >= 2 {
+                let last_part = parts.last().unwrap();
+                // Check if the last part looks like a TLD (2+ characters, alphanumeric)
+                if last_part.len() >= 2 && last_part.chars().all(|c| c.is_alphanumeric()) {
+                    return format!("https://{}", trimmed);
+                }
+            }
+        }
+        
+        // Treat as search query
+        self.settings.general.search_engine.search_url(trimmed)
     }
 
     /// Render the home page content

@@ -218,10 +218,49 @@ impl SettingsUI {
         }
     }
 
+    /// Get the settings file path
+    fn get_settings_path() -> std::path::PathBuf {
+        let data_dir = if cfg!(target_os = "windows") {
+            dirs::data_dir()
+                .unwrap_or_else(|| std::path::PathBuf::from("C:\\ProgramData"))
+                .join("Horizon")
+        } else if cfg!(target_os = "macos") {
+            dirs::data_dir()
+                .unwrap_or_else(|| std::path::PathBuf::from("/tmp"))
+                .join("Horizon")
+        } else {
+            dirs::data_dir()
+                .unwrap_or_else(|| std::path::PathBuf::from("/tmp"))
+                .join("Horizon")
+        };
+
+        // Ensure directory exists
+        if !data_dir.exists() {
+            let _ = std::fs::create_dir_all(&data_dir);
+        }
+
+        data_dir.join("settings.toml")
+    }
+
     /// Load settings from storage
     pub fn load() -> Self {
-        // TODO: Load from actual storage
-        Self::new()
+        let settings_path = Self::get_settings_path();
+        
+        if settings_path.exists() {
+            match horizon_storage::settings::Settings::load(&settings_path) {
+                Ok(storage_settings) => {
+                    tracing::info!("Settings loaded from {:?}", settings_path);
+                    Self::from_storage(&storage_settings)
+                }
+                Err(e) => {
+                    tracing::warn!("Failed to load settings: {}. Using defaults.", e);
+                    Self::new()
+                }
+            }
+        } else {
+            tracing::info!("No settings file found. Using defaults.");
+            Self::new()
+        }
     }
 
     /// Convert from storage settings
@@ -301,8 +340,17 @@ impl SettingsUI {
 
     /// Save settings to storage
     pub fn save(&self) {
-        // TODO: Save to actual storage
-        tracing::info!("Settings saved (not yet persisted to disk)");
+        let settings_path = Self::get_settings_path();
+        let storage_settings = self.to_storage();
+        
+        match storage_settings.save(&settings_path) {
+            Ok(()) => {
+                tracing::info!("Settings saved successfully to {:?}", settings_path);
+            }
+            Err(e) => {
+                tracing::error!("Failed to save settings: {}", e);
+            }
+        }
     }
 }
 
