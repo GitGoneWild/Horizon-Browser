@@ -8,12 +8,16 @@ use std::path::Path;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Settings {
     /// Privacy settings
+    #[serde(default)]
     pub privacy: PrivacySettings,
     /// Appearance settings
+    #[serde(default)]
     pub appearance: AppearanceSettings,
     /// General settings
+    #[serde(default)]
     pub general: GeneralSettings,
     /// Advanced settings
+    #[serde(default)]
     pub advanced: AdvancedSettings,
 }
 
@@ -29,6 +33,7 @@ pub struct PrivacySettings {
     /// Block third-party cookies
     pub block_third_party_cookies: bool,
     /// Enable HTTPS-only mode
+    #[serde(default)]
     pub https_only: bool,
 }
 
@@ -185,5 +190,41 @@ mod tests {
             loaded.privacy.tracking_protection
         );
         assert_eq!(settings.appearance.theme, loaded.appearance.theme);
+    }
+
+    #[test]
+    fn test_settings_backward_compatibility() {
+        // Test loading old settings file without https_only field
+        let old_settings_toml = r#"
+[privacy]
+tracking_protection = true
+clear_on_exit = false
+do_not_track = true
+block_third_party_cookies = true
+
+[appearance]
+theme = "Dark"
+font_size = 14
+show_bookmarks_bar = true
+
+[general]
+homepage = "about:home"
+search_engine = "DuckDuckGo"
+download_directory = "/tmp/downloads"
+restore_tabs_on_startup = false
+ask_where_to_save = true
+
+[advanced]
+enable_developer_tools = false
+hardware_acceleration = true
+experimental_features = false
+"#;
+
+        let settings: Settings = toml::from_str(old_settings_toml).unwrap();
+        
+        // Verify that https_only defaults to false when not present
+        assert!(!settings.privacy.https_only);
+        assert!(settings.privacy.tracking_protection);
+        assert!(settings.privacy.do_not_track);
     }
 }
