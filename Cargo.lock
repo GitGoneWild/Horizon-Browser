@@ -1619,8 +1619,10 @@ name = "horizon-ui"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "dirs",
  "eframe",
  "egui",
+ "horizon-storage",
  "serde",
  "serde_json",
  "tokio",

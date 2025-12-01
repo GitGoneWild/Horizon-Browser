@@ -13,6 +13,8 @@ pub struct Settings {
     pub appearance: AppearanceSettings,
     /// General settings
     pub general: GeneralSettings,
+    /// Advanced settings
+    pub advanced: AdvancedSettings,
 }
 
 /// Privacy-related settings
@@ -26,6 +28,8 @@ pub struct PrivacySettings {
     pub do_not_track: bool,
     /// Block third-party cookies
     pub block_third_party_cookies: bool,
+    /// Enable HTTPS-only mode
+    pub https_only: bool,
 }
 
 impl Default for PrivacySettings {
@@ -35,6 +39,7 @@ impl Default for PrivacySettings {
             clear_on_exit: false,
             do_not_track: true,
             block_third_party_cookies: true,
+            https_only: false,
         }
     }
 }
@@ -69,6 +74,10 @@ pub struct GeneralSettings {
     pub search_engine: String,
     /// Download directory
     pub download_directory: String,
+    /// Restore tabs on startup
+    pub restore_tabs_on_startup: bool,
+    /// Ask where to save files
+    pub ask_where_to_save: bool,
 }
 
 impl Default for GeneralSettings {
@@ -88,6 +97,29 @@ impl Default for GeneralSettings {
             homepage: "about:home".to_string(),
             search_engine: "DuckDuckGo".to_string(),
             download_directory: download_dir,
+            restore_tabs_on_startup: false,
+            ask_where_to_save: true,
+        }
+    }
+}
+
+/// Advanced settings
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AdvancedSettings {
+    /// Enable developer tools
+    pub enable_developer_tools: bool,
+    /// Hardware acceleration
+    pub hardware_acceleration: bool,
+    /// Enable experimental features
+    pub experimental_features: bool,
+}
+
+impl Default for AdvancedSettings {
+    fn default() -> Self {
+        Self {
+            enable_developer_tools: false,
+            hardware_acceleration: true,
+            experimental_features: false,
         }
     }
 }
@@ -99,6 +131,7 @@ impl Settings {
             privacy: PrivacySettings::default(),
             appearance: AppearanceSettings::default(),
             general: GeneralSettings::default(),
+            advanced: AdvancedSettings::default(),
         }
     }
 

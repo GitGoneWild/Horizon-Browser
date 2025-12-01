@@ -16,3 +16,5 @@ eframe = { workspace = true }
 egui = { workspace = true }
 uuid = { workspace = true }
 urlencoding = "2.1"
+dirs = { workspace = true }
+horizon-storage = { path = "../storage" }

@@ -68,6 +68,8 @@ struct BrowserApp {
     url_input: String,
     /// Tab to close (deferred)
     tab_to_close: Option<usize>,
+    /// Settings state
+    settings: crate::settings::SettingsUI,
 }
 
 impl BrowserApp {
@@ -75,51 +77,142 @@ impl BrowserApp {
     fn new() -> Self {
         let tab_manager = TabManager::new();
         let url_input = tab_manager.active_tab().url.clone();
+        let settings = crate::settings::SettingsUI::load();
 
         Self {
             tab_manager,
             url_input,
             tab_to_close: None,
+            settings,
         }
     }
 
     /// Process URL input and return a properly formatted URL
     fn process_url_input(&self, input: &str) -> String {
-        if input.starts_with("http://")
-            || input.starts_with("https://")
-            || input.starts_with("about:")
-        {
-            input.to_string()
-        } else if input.contains('.') {
-            format!("https://{}", input)
-        } else {
-            // Treat as search query - URL encode the input
-            let encoded_query = urlencoding::encode(input);
-            format!("https://duckduckgo.com/?q={}", encoded_query)
+        let trimmed = input.trim();
+        
+        // Check for special URLs
+        if trimmed.starts_with("about:") {
+            return trimmed.to_string();
         }
+        
+        // Check for explicit protocol
+        if trimmed.starts_with("http://") || trimmed.starts_with("https://") {
+            return trimmed.to_string();
+        }
+        
+        // Check if it looks like a domain/URL:
+        // - Contains at least one dot
+        // - Doesn't contain spaces
+        // - Has a valid TLD-like pattern (at least 2 chars after last dot)
+        if trimmed.contains('.') && !trimmed.contains(' ') {
+            let parts: Vec<&str> = trimmed.split('.').collect();
+            if parts.len() >= 2 {
+                let last_part = parts.last().unwrap();
+                // Check if the last part looks like a TLD (2+ characters, alphanumeric)
+                if last_part.len() >= 2 && last_part.chars().all(|c| c.is_alphanumeric()) {
+                    return format!("https://{}", trimmed);
+                }
+            }
+        }
+        
+        // Treat as search query
+        self.settings.general.search_engine.search_url(trimmed)
     }
 
     /// Render the home page content
     fn render_home_page(&self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
-            ui.add_space(100.0);
+            ui.add_space(80.0);
 
             // Horizon logo/title
             ui.heading(
                 egui::RichText::new("🌅 Horizon Browser")
-                    .size(48.0)
+                    .size(56.0)
+                    .strong()
                     .color(egui::Color32::from_rgb(88, 166, 255)),
             );
 
-            ui.add_space(20.0);
+            ui.add_space(16.0);
 
             ui.label(
-                egui::RichText::new("A Lightweight, Privacy-Focused Browser")
-                    .size(20.0)
+                egui::RichText::new("A Lightweight, Privacy-Focused Web Browser")
+                    .size(18.0)
                     .color(egui::Color32::from_rgb(230, 237, 243)),
             );
 
-            ui.add_space(40.0);
+            ui.add_space(50.0);
+
+            // Quick actions row
+            ui.horizontal(|ui| {
+                ui.add_space(200.0);
+
+                // Quick links button
+                egui::Frame::none()
+                    .fill(egui::Color32::from_rgb(22, 27, 34))
+                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
+                    .inner_margin(egui::Margin::same(20.0))
+                    .rounding(egui::Rounding::same(8.0))
+                    .show(ui, |ui| {
+                        ui.vertical_centered(|ui| {
+                            ui.label(egui::RichText::new("🔖").size(40.0));
+                            ui.add_space(8.0);
+                            ui.label(egui::RichText::new("Quick Links").size(16.0).strong());
+                            ui.add_space(4.0);
+                            ui.label(
+                                egui::RichText::new("Coming soon")
+                                    .size(12.0)
+                                    .color(egui::Color32::from_rgb(125, 140, 160)),
+                            );
+                        });
+                    });
+
+                ui.add_space(30.0);
+
+                // Recent tabs button
+                egui::Frame::none()
+                    .fill(egui::Color32::from_rgb(22, 27, 34))
+                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
+                    .inner_margin(egui::Margin::same(20.0))
+                    .rounding(egui::Rounding::same(8.0))
+                    .show(ui, |ui| {
+                        ui.vertical_centered(|ui| {
+                            ui.label(egui::RichText::new("🕐").size(40.0));
+                            ui.add_space(8.0);
+                            ui.label(egui::RichText::new("Recent").size(16.0).strong());
+                            ui.add_space(4.0);
+                            ui.label(
+                                egui::RichText::new("Coming soon")
+                                    .size(12.0)
+                                    .color(egui::Color32::from_rgb(125, 140, 160)),
+                            );
+                        });
+                    });
+
+                ui.add_space(30.0);
+
+                // Bookmarks button
+                egui::Frame::none()
+                    .fill(egui::Color32::from_rgb(22, 27, 34))
+                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
+                    .inner_margin(egui::Margin::same(20.0))
+                    .rounding(egui::Rounding::same(8.0))
+                    .show(ui, |ui| {
+                        ui.vertical_centered(|ui| {
+                            ui.label(egui::RichText::new("⭐").size(40.0));
+                            ui.add_space(8.0);
+                            ui.label(egui::RichText::new("Bookmarks").size(16.0).strong());
+                            ui.add_space(4.0);
+                            ui.label(
+                                egui::RichText::new("Coming soon")
+                                    .size(12.0)
+                                    .color(egui::Color32::from_rgb(125, 140, 160)),
+                            );
+                        });
+                    });
+            });
+
+            ui.add_space(60.0);
 
             // Features grid
             ui.horizontal(|ui| {
@@ -127,35 +220,53 @@ impl BrowserApp {
 
                 // Feature 1
                 ui.vertical(|ui| {
-                    ui.label(egui::RichText::new("🔒").size(32.0));
+                    ui.label(egui::RichText::new("🔒").size(36.0));
+                    ui.add_space(8.0);
                     ui.label(egui::RichText::new("Privacy First").size(16.0).strong());
-                    ui.label("Built-in tracking\nprotection");
+                    ui.add_space(4.0);
+                    ui.label(
+                        egui::RichText::new("Built-in tracking\nprotection")
+                            .size(13.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
                 });
 
-                ui.add_space(60.0);
+                ui.add_space(80.0);
 
                 // Feature 2
                 ui.vertical(|ui| {
-                    ui.label(egui::RichText::new("⚡").size(32.0));
+                    ui.label(egui::RichText::new("⚡").size(36.0));
+                    ui.add_space(8.0);
                     ui.label(
                         egui::RichText::new("Fast & Lightweight")
                             .size(16.0)
                             .strong(),
                     );
-                    ui.label("Minimal resource\nusage");
+                    ui.add_space(4.0);
+                    ui.label(
+                        egui::RichText::new("Minimal resource\nusage")
+                            .size(13.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
                 });
 
-                ui.add_space(60.0);
+                ui.add_space(80.0);
 
                 // Feature 3
                 ui.vertical(|ui| {
-                    ui.label(egui::RichText::new("🎨").size(32.0));
+                    ui.label(egui::RichText::new("🎨").size(36.0));
+                    ui.add_space(8.0);
                     ui.label(egui::RichText::new("Modern UI").size(16.0).strong());
-                    ui.label("Clean dark theme\ninterface");
+                    ui.add_space(4.0);
+                    ui.label(
+                        egui::RichText::new("Clean dark theme\ninterface")
+                            .size(13.0)
+                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                    );
                 });
             });
 
-            ui.add_space(60.0);
+            ui.add_space(80.0);
 
             ui.label(
                 egui::RichText::new("Enter a URL in the address bar to start browsing")
@@ -231,16 +342,321 @@ impl BrowserApp {
     }
 
     /// Render the content area based on current URL
-    fn render_content(&self, ui: &mut egui::Ui) {
-        let url = &self.tab_manager.active_tab().url;
+    fn render_content(&mut self, ui: &mut egui::Ui) {
+        let url = &self.tab_manager.active_tab().url.clone();
 
-        if url == "about:home" {
+        if url == "about:settings" {
+            self.render_settings_page(ui);
+        } else if url == "about:home" {
             self.render_home_page(ui);
         } else if url == "about:blank" {
             self.render_blank_page(ui);
         } else {
             self.render_web_page(ui, url);
         }
+    }
+
+    /// Render the settings page
+    fn render_settings_page(&mut self, ui: &mut egui::Ui) {
+        ui.horizontal(|ui| {
+            // Left sidebar for settings navigation
+            egui::SidePanel::left("settings_sidebar")
+                .default_width(200.0)
+                .resizable(false)
+                .frame(
+                    egui::Frame::none()
+                        .fill(egui::Color32::from_rgb(22, 27, 34))
+                        .inner_margin(egui::Margin::same(16.0)),
+                )
+                .show_inside(ui, |ui| {
+                    ui.heading(
+                        egui::RichText::new("⚙ Settings")
+                            .size(20.0)
+                            .color(egui::Color32::from_rgb(230, 237, 243)),
+                    );
+
+                    ui.add_space(20.0);
+
+                    // Settings navigation buttons
+                    let selected = &mut self.settings.selected_panel;
+
+                    if ui
+                        .selectable_label(
+                            *selected == crate::settings::SettingsPanel::General,
+                            "🏠 General",
+                        )
+                        .clicked()
+                    {
+                        *selected = crate::settings::SettingsPanel::General;
+                    }
+
+                    if ui
+                        .selectable_label(
+                            *selected == crate::settings::SettingsPanel::Privacy,
+                            "🔒 Privacy",
+                        )
+                        .clicked()
+                    {
+                        *selected = crate::settings::SettingsPanel::Privacy;
+                    }
+
+                    if ui
+                        .selectable_label(
+                            *selected == crate::settings::SettingsPanel::Appearance,
+                            "🎨 Appearance",
+                        )
+                        .clicked()
+                    {
+                        *selected = crate::settings::SettingsPanel::Appearance;
+                    }
+
+                    if ui
+                        .selectable_label(
+                            *selected == crate::settings::SettingsPanel::Downloads,
+                            "📥 Downloads",
+                        )
+                        .clicked()
+                    {
+                        *selected = crate::settings::SettingsPanel::Downloads;
+                    }
+
+                    if ui
+                        .selectable_label(
+                            *selected == crate::settings::SettingsPanel::Advanced,
+                            "🔧 Advanced",
+                        )
+                        .clicked()
+                    {
+                        *selected = crate::settings::SettingsPanel::Advanced;
+                    }
+                });
+
+            // Right panel for settings content
+            ui.vertical(|ui| {
+                ui.add_space(20.0);
+
+                egui::ScrollArea::vertical()
+                    .auto_shrink([false; 2])
+                    .show(ui, |ui| {
+                        ui.add_space(10.0);
+
+                        match self.settings.selected_panel {
+                            crate::settings::SettingsPanel::General => {
+                                self.render_general_settings(ui);
+                            }
+                            crate::settings::SettingsPanel::Privacy => {
+                                self.render_privacy_settings(ui);
+                            }
+                            crate::settings::SettingsPanel::Appearance => {
+                                self.render_appearance_settings(ui);
+                            }
+                            crate::settings::SettingsPanel::Downloads => {
+                                self.render_downloads_settings(ui);
+                            }
+                            crate::settings::SettingsPanel::Advanced => {
+                                self.render_advanced_settings(ui);
+                            }
+                        }
+
+                        ui.add_space(20.0);
+
+                        // Save button
+                        ui.horizontal(|ui| {
+                            if ui.button("💾 Save Settings").clicked() {
+                                self.settings.save();
+                            }
+                        });
+                    });
+            });
+        });
+    }
+
+    /// Render general settings panel
+    fn render_general_settings(&mut self, ui: &mut egui::Ui) {
+        ui.heading(
+            egui::RichText::new("General Settings")
+                .size(18.0)
+                .color(egui::Color32::from_rgb(230, 237, 243)),
+        );
+        ui.add_space(10.0);
+
+        ui.label("Homepage URL:");
+        ui.text_edit_singleline(&mut self.settings.general.homepage);
+        ui.add_space(10.0);
+
+        ui.label("Default Search Engine:");
+        egui::ComboBox::from_label("")
+            .selected_text(self.settings.general.search_engine.name())
+            .show_ui(ui, |ui| {
+                for engine in crate::settings::SearchEngine::all() {
+                    ui.selectable_value(
+                        &mut self.settings.general.search_engine,
+                        *engine,
+                        engine.name(),
+                    );
+                }
+            });
+        ui.add_space(10.0);
+
+        ui.checkbox(
+            &mut self.settings.general.restore_tabs_on_startup,
+            "Restore tabs on startup",
+        );
+    }
+
+    /// Render privacy settings panel
+    fn render_privacy_settings(&mut self, ui: &mut egui::Ui) {
+        ui.heading(
+            egui::RichText::new("Privacy & Security")
+                .size(18.0)
+                .color(egui::Color32::from_rgb(230, 237, 243)),
+        );
+        ui.add_space(10.0);
+
+        ui.checkbox(
+            &mut self.settings.privacy.tracking_protection,
+            "Enable tracking protection",
+        );
+        ui.label(
+            egui::RichText::new("Blocks known trackers from loading")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        ui.checkbox(&mut self.settings.privacy.do_not_track, "Send Do Not Track");
+        ui.label(
+            egui::RichText::new("Tells websites you don't want to be tracked")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        ui.checkbox(
+            &mut self.settings.privacy.block_third_party_cookies,
+            "Block third-party cookies",
+        );
+        ui.label(
+            egui::RichText::new("Prevents cross-site tracking")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        ui.checkbox(
+            &mut self.settings.privacy.https_only,
+            "Enable HTTPS-only mode",
+        );
+        ui.label(
+            egui::RichText::new("Only connect to secure HTTPS websites")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        ui.checkbox(
+            &mut self.settings.privacy.clear_data_on_exit,
+            "Clear browsing data on exit",
+        );
+        ui.label(
+            egui::RichText::new("Clears cookies, cache, and history when closing the browser")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+    }
+
+    /// Render appearance settings panel
+    fn render_appearance_settings(&mut self, ui: &mut egui::Ui) {
+        ui.heading(
+            egui::RichText::new("Appearance")
+                .size(18.0)
+                .color(egui::Color32::from_rgb(230, 237, 243)),
+        );
+        ui.add_space(10.0);
+
+        ui.label("Theme:");
+        egui::ComboBox::from_label("")
+            .selected_text(self.settings.appearance.theme.name())
+            .show_ui(ui, |ui| {
+                for theme in crate::settings::Theme::all() {
+                    ui.selectable_value(
+                        &mut self.settings.appearance.theme,
+                        *theme,
+                        theme.name(),
+                    );
+                }
+            });
+        ui.add_space(10.0);
+
+        ui.label("Font Size:");
+        ui.add(egui::Slider::new(&mut self.settings.appearance.font_size, 10..=20).suffix(" px"));
+        ui.add_space(10.0);
+
+        ui.checkbox(
+            &mut self.settings.appearance.show_bookmarks_bar,
+            "Show bookmarks bar",
+        );
+    }
+
+    /// Render downloads settings panel
+    fn render_downloads_settings(&mut self, ui: &mut egui::Ui) {
+        ui.heading(
+            egui::RichText::new("Downloads")
+                .size(18.0)
+                .color(egui::Color32::from_rgb(230, 237, 243)),
+        );
+        ui.add_space(10.0);
+
+        ui.label("Download Directory:");
+        ui.text_edit_singleline(&mut self.settings.downloads.download_directory);
+        ui.add_space(10.0);
+
+        ui.checkbox(
+            &mut self.settings.downloads.ask_where_to_save,
+            "Always ask where to save files",
+        );
+    }
+
+    /// Render advanced settings panel
+    fn render_advanced_settings(&mut self, ui: &mut egui::Ui) {
+        ui.heading(
+            egui::RichText::new("Advanced")
+                .size(18.0)
+                .color(egui::Color32::from_rgb(230, 237, 243)),
+        );
+        ui.add_space(10.0);
+
+        ui.checkbox(
+            &mut self.settings.advanced.enable_developer_tools,
+            "Enable developer tools",
+        );
+        ui.label(
+            egui::RichText::new("Enables debugging and inspection features")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        ui.checkbox(
+            &mut self.settings.advanced.hardware_acceleration,
+            "Use hardware acceleration",
+        );
+        ui.label(
+            egui::RichText::new("Improves rendering performance")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
+        ui.add_space(8.0);
+
+        ui.checkbox(
+            &mut self.settings.advanced.experimental_features,
+            "Enable experimental features",
+        );
+        ui.label(
+            egui::RichText::new("Try new features before they're officially released")
+                .size(12.0)
+                .color(egui::Color32::from_rgb(125, 140, 160)),
+        );
     }
 }
 
@@ -266,6 +682,58 @@ impl eframe::App for BrowserApp {
         style.visuals.panel_fill = egui::Color32::from_rgb(13, 17, 23);
 
         ctx.set_style(style);
+
+        // Handle keyboard shortcuts
+        ctx.input(|i| {
+            // Ctrl+T: New tab
+            if i.modifiers.command && i.key_pressed(egui::Key::T) {
+                self.tab_manager.new_tab("about:home");
+                self.url_input = "about:home".to_string();
+            }
+
+            // Ctrl+W: Close tab
+            if i.modifiers.command && i.key_pressed(egui::Key::W) {
+                let current_index = self.tab_manager.active_tab_index();
+                if self.tab_manager.tab_count() > 1 {
+                    self.tab_to_close = Some(current_index);
+                }
+            }
+
+            // Ctrl+R or F5: Reload
+            if (i.modifiers.command && i.key_pressed(egui::Key::R))
+                || i.key_pressed(egui::Key::F5)
+            {
+                self.tab_manager.active_tab_mut().reload();
+            }
+
+            // Alt+Left: Back
+            if i.modifiers.alt && i.key_pressed(egui::Key::ArrowLeft)
+                && self.tab_manager.active_tab().can_go_back() {
+                    self.tab_manager.active_tab_mut().go_back();
+                    self.url_input = self.tab_manager.active_tab().url.clone();
+                }
+
+            // Alt+Right: Forward
+            if i.modifiers.alt && i.key_pressed(egui::Key::ArrowRight)
+                && self.tab_manager.active_tab().can_go_forward() {
+                    self.tab_manager.active_tab_mut().go_forward();
+                    self.url_input = self.tab_manager.active_tab().url.clone();
+                }
+
+            // Alt+Home: Go to home
+            if i.modifiers.alt && i.key_pressed(egui::Key::Home) {
+                self.tab_manager
+                    .active_tab_mut()
+                    .navigate_to(&self.settings.general.homepage);
+                self.url_input = self.settings.general.homepage.clone();
+            }
+
+            // Ctrl+L: Focus address bar (simulated by clearing it)
+            if i.modifiers.command && i.key_pressed(egui::Key::L) {
+                // Request focus on address bar in next frame
+                tracing::debug!("Focus address bar");
+            }
+        });
 
         // Handle deferred tab close
         if let Some(index) = self.tab_to_close.take() {
@@ -300,10 +768,24 @@ impl eframe::App for BrowserApp {
                         egui::Frame::none()
                             .fill(bg_color)
                             .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(48, 54, 61)))
-                            .inner_margin(egui::Margin::symmetric(12.0, 8.0))
-                            .rounding(egui::Rounding::same(4.0))
+                            .inner_margin(egui::Margin::symmetric(12.0, 6.0))
+                            .rounding(egui::Rounding {
+                                nw: 6.0,
+                                ne: 6.0,
+                                sw: 0.0,
+                                se: 0.0,
+                            })
                             .show(ui, |ui| {
                                 ui.horizontal(|ui| {
+                                    // Loading indicator
+                                    if tab.is_loading {
+                                        ui.label(
+                                            egui::RichText::new("⟳")
+                                                .size(10.0)
+                                                .color(egui::Color32::from_rgb(88, 166, 255)),
+                                        );
+                                    }
+
                                     // Tab title
                                     let title = tab.display_title();
                                     let truncated_title = if title.len() > MAX_TAB_TITLE_LENGTH {
@@ -322,7 +804,8 @@ impl eframe::App for BrowserApp {
                                         .add(
                                             egui::Label::new(
                                                 egui::RichText::new(truncated_title)
-                                                    .color(text_color),
+                                                    .color(text_color)
+                                                    .size(13.0),
                                             )
                                             .sense(egui::Sense::click()),
                                         )
@@ -332,8 +815,22 @@ impl eframe::App for BrowserApp {
                                     }
 
                                     // Close button
+                                    let close_color = if is_active {
+                                        egui::Color32::from_rgb(230, 237, 243)
+                                    } else {
+                                        egui::Color32::from_rgb(125, 140, 160)
+                                    };
+
                                     if ui
-                                        .add(egui::Button::new("✕").frame(false).small())
+                                        .add(
+                                            egui::Button::new(
+                                                egui::RichText::new("✕")
+                                                    .size(12.0)
+                                                    .color(close_color),
+                                            )
+                                            .frame(false)
+                                            .small(),
+                                        )
                                         .clicked()
                                     {
                                         self.tab_to_close = Some(index);
@@ -345,8 +842,14 @@ impl eframe::App for BrowserApp {
                     }
 
                     // New tab button
+                    ui.add_space(4.0);
                     if ui
-                        .add(egui::Button::new("➕").frame(true).small())
+                        .add(
+                            egui::Button::new(egui::RichText::new("➕").size(14.0))
+                                .frame(true)
+                                .small(),
+                        )
+                        .on_hover_text("New tab (Ctrl+T)")
                         .clicked()
                     {
                         new_tab_clicked = true;
@@ -379,7 +882,7 @@ impl eframe::App for BrowserApp {
                     let can_go_back = self.tab_manager.active_tab().can_go_back();
                     if ui
                         .add_enabled(can_go_back, egui::Button::new("◀"))
-                        .on_hover_text("Go back")
+                        .on_hover_text("Go back (Alt+Left)")
                         .clicked()
                     {
                         self.tab_manager.active_tab_mut().go_back();
@@ -390,7 +893,7 @@ impl eframe::App for BrowserApp {
                     let can_go_forward = self.tab_manager.active_tab().can_go_forward();
                     if ui
                         .add_enabled(can_go_forward, egui::Button::new("▶"))
-                        .on_hover_text("Go forward")
+                        .on_hover_text("Go forward (Alt+Right)")
                         .clicked()
                     {
                         self.tab_manager.active_tab_mut().go_forward();
@@ -398,13 +901,37 @@ impl eframe::App for BrowserApp {
                     }
 
                     // Reload button
-                    if ui
-                        .add(egui::Button::new("⟳"))
-                        .on_hover_text("Reload page")
+                    let is_loading = self.tab_manager.active_tab().is_loading;
+                    let reload_text = if is_loading { "⏹" } else { "⟳" };
+                    let reload_tooltip = if is_loading {
+                        "Stop loading"
+                    } else {
+                        "Reload page (Ctrl+R)"
+                    };
+
+                    if ui.add(egui::Button::new(reload_text))
+                        .on_hover_text(reload_tooltip)
                         .clicked()
                     {
-                        self.tab_manager.active_tab_mut().reload();
-                        tracing::info!("Reloading page");
+                        if is_loading {
+                            self.tab_manager.active_tab_mut().finish_loading();
+                            tracing::info!("Stopped loading");
+                        } else {
+                            self.tab_manager.active_tab_mut().reload();
+                            tracing::info!("Reloading page");
+                        }
+                    }
+
+                    // Home button
+                    if ui
+                        .add(egui::Button::new("🏠"))
+                        .on_hover_text("Go to home page (Alt+Home)")
+                        .clicked()
+                    {
+                        let homepage = self.settings.general.homepage.clone();
+                        self.tab_manager.active_tab_mut().navigate_to(&homepage);
+                        self.url_input = homepage;
+                        tracing::info!("Navigating to home");
                     }
 
                     ui.add_space(8.0);
@@ -412,8 +939,8 @@ impl eframe::App for BrowserApp {
                     // Address bar
                     let response = ui.add(
                         egui::TextEdit::singleline(&mut self.url_input)
-                            .desired_width(ui.available_width() - 60.0)
-                            .hint_text("Enter URL or search...")
+                            .desired_width(ui.available_width() - 120.0)
+                            .hint_text("Search or enter address...")
                             .frame(true),
                     );
 
@@ -425,12 +952,17 @@ impl eframe::App for BrowserApp {
                         tracing::info!("Navigating to: {}", self.url_input);
                     }
 
-                    // Go button
-                    if ui.button("Go").clicked() {
-                        let url = self.process_url_input(&self.url_input);
-                        self.tab_manager.active_tab_mut().navigate_to(&url);
-                        self.url_input = url;
-                        tracing::info!("Navigating to: {}", self.url_input);
+                    ui.add_space(4.0);
+
+                    // Settings button
+                    if ui
+                        .add(egui::Button::new("⚙"))
+                        .on_hover_text("Settings")
+                        .clicked()
+                    {
+                        self.tab_manager.active_tab_mut().navigate_to("about:settings");
+                        self.url_input = "about:settings".to_string();
+                        tracing::info!("Opening settings");
                     }
                 });
             });
