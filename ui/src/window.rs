@@ -124,17 +124,17 @@ impl BrowserApp {
         self.settings.general.search_engine.search_url(trimmed)
     }
 
-    /// Render the home page content with enhanced dashboard
+    /// Render the home page content with Firefox-inspired design
     fn render_home_page(&self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
             ui.add_space(60.0);
 
-            // Branded Horizon header with gradient-style colors
+            // Branded Horizon header with Firefox blue
             ui.heading(
                 egui::RichText::new("🌅 Horizon")
                     .size(64.0)
                     .strong()
-                    .color(egui::Color32::from_rgb(0, 191, 255)), // Neon blue
+                    .color(egui::Color32::from_rgb(59, 130, 246)), // Firefox blue
             );
 
             ui.add_space(12.0);
@@ -142,20 +142,20 @@ impl BrowserApp {
             ui.label(
                 egui::RichText::new("Modern, Privacy-Focused Web Browser")
                     .size(20.0)
-                    .color(egui::Color32::from_rgb(160, 32, 240)), // Neon purple accent
+                    .color(egui::Color32::from_rgb(156, 163, 175)), // Secondary text
             );
 
             ui.add_space(40.0);
 
-            // Central search bar
+            // Central search bar with Firefox-style
             ui.horizontal(|ui| {
                 ui.add_space((ui.available_width() - 600.0) / 2.0);
 
                 egui::Frame::none()
-                    .fill(egui::Color32::from_rgba_premultiplied(22, 27, 34, 200))
-                    .stroke(egui::Stroke::new(2.0, egui::Color32::from_rgb(0, 191, 255)))
+                    .fill(egui::Color32::from_rgba_premultiplied(31, 41, 51, 200))
+                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(55, 65, 81)))
                     .inner_margin(egui::Margin::symmetric(16.0, 12.0))
-                    .rounding(egui::Rounding::same(8.0))
+                    .rounding(egui::Rounding::same(6.0)) // Firefox 6px for inputs
                     .show(ui, |ui| {
                         ui.horizontal(|ui| {
                             ui.label(egui::RichText::new("🔍").size(20.0));
@@ -240,13 +240,13 @@ impl BrowserApp {
         });
     }
 
-    /// Render an app shortcut card
+    /// Render an app shortcut card with Firefox styling
     fn render_app_card(&self, ui: &mut egui::Ui, icon: &str, title: &str, subtitle: &str) {
         egui::Frame::none()
-            .fill(egui::Color32::from_rgb(30, 30, 30))
-            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(51, 51, 51)))
+            .fill(egui::Color32::from_rgb(31, 41, 51)) // Toolbar color
+            .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(55, 65, 81)))
             .inner_margin(egui::Margin::same(20.0))
-            .rounding(egui::Rounding::same(8.0))
+            .rounding(egui::Rounding::same(6.0)) // Firefox 6px for panels
             .show(ui, |ui| {
                 ui.set_width(220.0);
                 ui.vertical_centered(|ui| {
@@ -256,13 +256,13 @@ impl BrowserApp {
                         egui::RichText::new(title)
                             .size(18.0)
                             .strong()
-                            .color(egui::Color32::from_rgb(230, 237, 243)),
+                            .color(egui::Color32::from_rgb(249, 250, 251)), // Primary text
                     );
                     ui.add_space(4.0);
                     ui.label(
                         egui::RichText::new(subtitle)
                             .size(13.0)
-                            .color(egui::Color32::from_rgb(125, 140, 160)),
+                            .color(egui::Color32::from_rgb(156, 163, 175)), // Secondary text
                     );
                 });
             });
@@ -1254,29 +1254,29 @@ impl Default for BrowserApp {
 
 impl eframe::App for BrowserApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // Apply custom modern dark theme with gradient-inspired colors
+        // Apply Firefox-inspired dark theme
         let mut style = (*ctx.style()).clone();
         style.visuals = egui::Visuals::dark();
 
-        // Customize colors to match modern dark theme with gradients (#1E1E1E to #2A2A2A)
-        style.visuals.widgets.noninteractive.bg_fill = egui::Color32::from_rgb(30, 30, 30);
-        style.visuals.widgets.inactive.bg_fill = egui::Color32::from_rgb(34, 34, 34);
-        style.visuals.widgets.hovered.bg_fill = egui::Color32::from_rgb(42, 42, 42);
-        style.visuals.widgets.active.bg_fill = egui::Color32::from_rgb(0, 191, 255); // Neon blue for active
-        style.visuals.extreme_bg_color = egui::Color32::from_rgb(30, 30, 30);
-        style.visuals.window_fill = egui::Color32::from_rgb(30, 30, 30);
-        style.visuals.panel_fill = egui::Color32::from_rgb(30, 30, 30);
+        // Firefox-inspired color scheme: #111827 window, #1F2933 toolbar, #3B82F6 accent
+        style.visuals.widgets.noninteractive.bg_fill = egui::Color32::from_rgb(17, 24, 39);
+        style.visuals.widgets.inactive.bg_fill = egui::Color32::from_rgb(31, 41, 51);
+        style.visuals.widgets.hovered.bg_fill = egui::Color32::from_rgb(55, 65, 81);
+        style.visuals.widgets.active.bg_fill = egui::Color32::from_rgb(59, 130, 246); // Firefox blue
+        style.visuals.extreme_bg_color = egui::Color32::from_rgb(17, 24, 39);
+        style.visuals.window_fill = egui::Color32::from_rgb(17, 24, 39);
+        style.visuals.panel_fill = egui::Color32::from_rgb(17, 24, 39);
 
-        // Set rounding to 8px for modern rounded corners
-        style.visuals.widgets.noninteractive.rounding = egui::Rounding::same(8.0);
-        style.visuals.widgets.inactive.rounding = egui::Rounding::same(8.0);
-        style.visuals.widgets.hovered.rounding = egui::Rounding::same(8.0);
-        style.visuals.widgets.active.rounding = egui::Rounding::same(8.0);
+        // Firefox-style border radius (4px for buttons/tabs, 6px for inputs)
+        style.visuals.widgets.noninteractive.rounding = egui::Rounding::same(4.0);
+        style.visuals.widgets.inactive.rounding = egui::Rounding::same(4.0);
+        style.visuals.widgets.hovered.rounding = egui::Rounding::same(4.0);
+        style.visuals.widgets.active.rounding = egui::Rounding::same(4.0);
 
-        // Enhance selection colors with neon accents
-        style.visuals.selection.bg_fill = egui::Color32::from_rgba_premultiplied(0, 191, 255, 80);
+        // Firefox-inspired selection colors
+        style.visuals.selection.bg_fill = egui::Color32::from_rgba_premultiplied(59, 130, 246, 80);
         style.visuals.selection.stroke =
-            egui::Stroke::new(1.0, egui::Color32::from_rgb(0, 191, 255));
+            egui::Stroke::new(1.0, egui::Color32::from_rgb(59, 130, 246));
 
         ctx.set_style(style);
 
@@ -1341,15 +1341,15 @@ impl eframe::App for BrowserApp {
             self.url_input = self.tab_manager.active_tab().url.clone();
         }
 
-        // Tab bar with modern styling
+        // Tab bar with Firefox-inspired styling
         let mut switch_to_tab: Option<usize> = None;
         let mut new_tab_clicked = false;
 
         egui::TopBottomPanel::top("tab_bar")
             .frame(
                 egui::Frame::none()
-                    .fill(egui::Color32::from_rgb(34, 34, 34))
-                    .inner_margin(egui::Margin::symmetric(8.0, 6.0)),
+                    .fill(egui::Color32::from_rgb(31, 41, 51)) // Firefox toolbar color
+                    .inner_margin(egui::Margin::symmetric(8.0, 4.0)),
             )
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
@@ -1359,16 +1359,16 @@ impl eframe::App for BrowserApp {
                     for (index, tab) in self.tab_manager.tabs().iter().enumerate() {
                         let is_active = index == active_index;
 
-                        // Pill-shaped tab styling with gradient-inspired colors
+                        // Firefox-style tab with subtle styling
                         let (bg_color, stroke_color) = if is_active {
                             (
-                                egui::Color32::from_rgb(42, 42, 42),
-                                egui::Color32::from_rgb(0, 191, 255), // Neon blue border for active
+                                egui::Color32::from_rgb(17, 24, 39), // Active tab matches window
+                                egui::Color32::from_rgb(59, 130, 246), // Firefox blue border
                             )
                         } else {
                             (
-                                egui::Color32::from_rgb(30, 30, 30),
-                                egui::Color32::from_rgb(48, 54, 61),
+                                egui::Color32::from_rgb(31, 41, 51), // Inactive tab matches toolbar
+                                egui::Color32::from_rgb(55, 65, 81),  // Subtle border
                             )
                         };
 
@@ -1378,8 +1378,8 @@ impl eframe::App for BrowserApp {
                                 if is_active { 2.0 } else { 1.0 },
                                 stroke_color,
                             ))
-                            .inner_margin(egui::Margin::symmetric(14.0, 8.0))
-                            .rounding(egui::Rounding::same(8.0)) // Fully rounded pill shape
+                            .inner_margin(egui::Margin::symmetric(12.0, 6.0))
+                            .rounding(egui::Rounding::same(4.0)) // Firefox 4px radius
                             .show(ui, |ui| {
                                 ui.horizontal(|ui| {
                                     // Loading indicator
@@ -1387,7 +1387,7 @@ impl eframe::App for BrowserApp {
                                         ui.label(
                                             egui::RichText::new("⟳")
                                                 .size(10.0)
-                                                .color(egui::Color32::from_rgb(88, 166, 255)),
+                                                .color(egui::Color32::from_rgb(59, 130, 246)),
                                         );
                                     }
 
@@ -1400,9 +1400,9 @@ impl eframe::App for BrowserApp {
                                     };
 
                                     let text_color = if is_active {
-                                        egui::Color32::from_rgb(230, 237, 243)
+                                        egui::Color32::from_rgb(249, 250, 251) // Primary text
                                     } else {
-                                        egui::Color32::from_rgb(125, 140, 160)
+                                        egui::Color32::from_rgb(156, 163, 175) // Secondary text
                                     };
 
                                     if ui
@@ -1410,7 +1410,7 @@ impl eframe::App for BrowserApp {
                                             egui::Label::new(
                                                 egui::RichText::new(truncated_title)
                                                     .color(text_color)
-                                                    .size(13.0),
+                                                    .size(13.0), // Firefox tab text size
                                             )
                                             .sense(egui::Sense::click()),
                                         )
@@ -1421,9 +1421,9 @@ impl eframe::App for BrowserApp {
 
                                     // Close button
                                     let close_color = if is_active {
-                                        egui::Color32::from_rgb(230, 237, 243)
+                                        egui::Color32::from_rgb(249, 250, 251)
                                     } else {
-                                        egui::Color32::from_rgb(125, 140, 160)
+                                        egui::Color32::from_rgb(156, 163, 175)
                                     };
 
                                     if ui
@@ -1474,7 +1474,7 @@ impl eframe::App for BrowserApp {
             self.url_input = "about:home".to_string();
         }
 
-        // Left sidebar navigation
+        // Left sidebar navigation with Firefox styling
         let mut sidebar_action: Option<crate::sidebar::SidebarItem> = None;
         let mut toggle_sidebar = false;
 
@@ -1483,7 +1483,7 @@ impl eframe::App for BrowserApp {
             .resizable(false)
             .frame(
                 egui::Frame::none()
-                    .fill(egui::Color32::from_rgb(30, 30, 30))
+                    .fill(egui::Color32::from_rgb(17, 24, 39)) // Match window background
                     .inner_margin(egui::Margin::same(8.0)),
             )
             .show(ctx, |ui| {
@@ -1519,16 +1519,16 @@ impl eframe::App for BrowserApp {
 
                         let button = egui::Button::new(button_text)
                             .fill(if is_selected {
-                                egui::Color32::from_rgb(42, 42, 42)
+                                egui::Color32::from_rgb(31, 41, 51) // Toolbar color for selection
                             } else {
-                                egui::Color32::from_rgb(30, 30, 30)
+                                egui::Color32::from_rgb(17, 24, 39) // Window background
                             })
                             .stroke(if is_selected {
-                                egui::Stroke::new(2.0, egui::Color32::from_rgb(0, 191, 255))
+                                egui::Stroke::new(2.0, egui::Color32::from_rgb(59, 130, 246)) // Firefox blue
                             } else {
                                 egui::Stroke::NONE
                             })
-                            .rounding(egui::Rounding::same(8.0));
+                            .rounding(egui::Rounding::same(4.0)); // Firefox 4px
 
                         if ui
                             .add_sized([ui.available_width(), 40.0], button)
@@ -1567,12 +1567,12 @@ impl eframe::App for BrowserApp {
             }
         }
 
-        // Navigation bar with modern styling
+        // Navigation bar with Firefox-inspired styling
         egui::TopBottomPanel::top("nav_bar")
             .frame(
                 egui::Frame::none()
-                    .fill(egui::Color32::from_rgb(34, 34, 34))
-                    .inner_margin(egui::Margin::symmetric(12.0, 10.0)),
+                    .fill(egui::Color32::from_rgb(31, 41, 51)) // Firefox toolbar color
+                    .inner_margin(egui::Margin::symmetric(12.0, 8.0)),
             )
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
@@ -1582,7 +1582,7 @@ impl eframe::App for BrowserApp {
                         .add_enabled(
                             can_go_back,
                             egui::Button::new(egui::RichText::new("◀").size(16.0))
-                                .rounding(egui::Rounding::same(6.0)),
+                                .rounding(egui::Rounding::same(4.0)), // Firefox 4px
                         )
                         .on_hover_text("Go back (Alt+Left)")
                         .clicked()
@@ -1596,7 +1596,7 @@ impl eframe::App for BrowserApp {
                         .add_enabled(
                             can_go_forward,
                             egui::Button::new(egui::RichText::new("▶").size(16.0))
-                                .rounding(egui::Rounding::same(6.0)),
+                                .rounding(egui::Rounding::same(4.0)),
                         )
                         .on_hover_text("Go forward (Alt+Right)")
                         .clicked()
@@ -1617,7 +1617,7 @@ impl eframe::App for BrowserApp {
                     if ui
                         .add(
                             egui::Button::new(egui::RichText::new(reload_text).size(16.0))
-                                .rounding(egui::Rounding::same(6.0)),
+                                .rounding(egui::Rounding::same(4.0)),
                         )
                         .on_hover_text(reload_tooltip)
                         .clicked()
@@ -1635,7 +1635,7 @@ impl eframe::App for BrowserApp {
                     if ui
                         .add(
                             egui::Button::new(egui::RichText::new("🏠").size(16.0))
-                                .rounding(egui::Rounding::same(6.0)),
+                                .rounding(egui::Rounding::same(4.0)),
                         )
                         .on_hover_text("Go to home page (Alt+Home)")
                         .clicked()
@@ -1646,7 +1646,7 @@ impl eframe::App for BrowserApp {
                         tracing::info!("Navigating to home");
                     }
 
-                    ui.add_space(12.0);
+                    ui.add_space(8.0); // Firefox 8px spacing
 
                     // SSL/Security lock icon
                     let current_url = &self.tab_manager.active_tab().url;
@@ -1654,21 +1654,21 @@ impl eframe::App for BrowserApp {
                         if current_url.starts_with("https://") {
                             (
                                 "🔒",
-                                egui::Color32::from_rgb(63, 185, 80),
+                                egui::Color32::from_rgb(34, 197, 94), // Green
                                 "Secure connection (HTTPS)",
                             )
                         } else if current_url.starts_with("http://") {
                             (
                                 "⚠",
-                                egui::Color32::from_rgb(187, 128, 9),
+                                egui::Color32::from_rgb(251, 191, 36), // Warning yellow
                                 "Not secure (HTTP)",
                             )
                         } else if current_url.starts_with("about:") {
-                            ("ℹ", egui::Color32::from_rgb(0, 191, 255), "Internal page")
+                            ("ℹ", egui::Color32::from_rgb(59, 130, 246), "Internal page")
                         } else {
                             (
                                 "🌐",
-                                egui::Color32::from_rgb(125, 140, 160),
+                                egui::Color32::from_rgb(156, 163, 175),
                                 "Local or unknown",
                             )
                         };
@@ -1682,7 +1682,7 @@ impl eframe::App for BrowserApp {
 
                     ui.add_space(6.0);
 
-                    // Address bar with glassmorphism-inspired styling
+                    // Address bar with Firefox-style rounded input (6-8px radius)
                     let address_bar_response = ui.add(
                         egui::TextEdit::singleline(&mut self.url_input)
                             .desired_width(ui.available_width() - 120.0)
@@ -1706,7 +1706,7 @@ impl eframe::App for BrowserApp {
                     if ui
                         .add(
                             egui::Button::new(egui::RichText::new("⭐").size(16.0))
-                                .rounding(egui::Rounding::same(6.0)),
+                                .rounding(egui::Rounding::same(4.0)),
                         )
                         .on_hover_text("Bookmark this page")
                         .clicked()
@@ -1720,7 +1720,7 @@ impl eframe::App for BrowserApp {
                     if ui
                         .add(
                             egui::Button::new(egui::RichText::new("👤").size(16.0))
-                                .rounding(egui::Rounding::same(6.0)),
+                                .rounding(egui::Rounding::same(4.0)),
                         )
                         .on_hover_text("Profile")
                         .clicked()
@@ -1730,9 +1730,9 @@ impl eframe::App for BrowserApp {
                 });
             });
 
-        // Central panel for content with gradient-inspired background
+        // Central panel for content with Firefox background
         egui::CentralPanel::default()
-            .frame(egui::Frame::none().fill(egui::Color32::from_rgb(30, 30, 30)))
+            .frame(egui::Frame::none().fill(egui::Color32::from_rgb(17, 24, 39))) // Match window
             .show(ctx, |ui| {
                 egui::ScrollArea::vertical()
                     .auto_shrink([false; 2])
