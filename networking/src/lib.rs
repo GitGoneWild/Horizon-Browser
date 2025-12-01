@@ -1,12 +1,15 @@
 //! # Horizon Networking
 //!
 //! Networking layer for the Horizon Browser.
-//! Provides HTTP client, DNS resolution, and request/response handling.
+//! Provides HTTP client, DNS resolution, VPN management, speed testing,
+//! and request/response handling.
 
 pub mod client;
 pub mod dns;
 pub mod request;
 pub mod response;
+pub mod speedtest;
+pub mod vpn;
 
 use anyhow::Result;
 

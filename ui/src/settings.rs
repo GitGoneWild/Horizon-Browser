@@ -11,6 +11,8 @@ pub struct SettingsUI {
     pub privacy: PrivacySettings,
     /// Appearance settings
     pub appearance: AppearanceSettings,
+    /// Network settings
+    pub network: NetworkSettings,
     /// Downloads settings
     pub downloads: DownloadsSettings,
     /// Advanced settings
@@ -28,6 +30,9 @@ pub enum SettingsPanel {
     General,
     Privacy,
     Appearance,
+    Network,
+    Passwords,
+    Extensions,
     Downloads,
     Advanced,
 }
@@ -195,6 +200,84 @@ pub struct AdvancedSettings {
     pub experimental_features: bool,
 }
 
+/// Network settings
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NetworkSettings {
+    /// DNS provider
+    pub dns_provider: DnsProvider,
+    /// Custom DNS servers (comma-separated)
+    pub custom_dns_servers: String,
+    /// Enable VPN
+    pub vpn_enabled: bool,
+    /// VPN configuration type
+    pub vpn_type: VpnType,
+    /// Proxy host (for proxy-based VPN)
+    pub proxy_host: String,
+    /// Proxy port
+    pub proxy_port: u16,
+}
+
+impl Default for NetworkSettings {
+    fn default() -> Self {
+        Self {
+            dns_provider: DnsProvider::System,
+            custom_dns_servers: String::new(),
+            vpn_enabled: false,
+            vpn_type: VpnType::Proxy,
+            proxy_host: String::new(),
+            proxy_port: 8080,
+        }
+    }
+}
+
+/// DNS provider options
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum DnsProvider {
+    System,
+    Google,
+    Cloudflare,
+    Quad9,
+    Custom,
+}
+
+impl DnsProvider {
+    pub fn name(&self) -> &str {
+        match self {
+            Self::System => "System Default",
+            Self::Google => "Google DNS (8.8.8.8)",
+            Self::Cloudflare => "Cloudflare DNS (1.1.1.1)",
+            Self::Quad9 => "Quad9 DNS (9.9.9.9)",
+            Self::Custom => "Custom DNS",
+        }
+    }
+
+    pub fn all() -> &'static [Self] {
+        &[Self::System, Self::Google, Self::Cloudflare, Self::Quad9, Self::Custom]
+    }
+}
+
+/// VPN type options
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum VpnType {
+    Proxy,
+    Socks5,
+    OpenVpn,
+}
+
+impl VpnType {
+    pub fn name(&self) -> &str {
+        match self {
+            Self::Proxy => "HTTP/HTTPS Proxy",
+            Self::Socks5 => "SOCKS5 Proxy",
+            Self::OpenVpn => "OpenVPN (.ovpn file)",
+        }
+    }
+
+    pub fn all() -> &'static [Self] {
+        &[Self::Proxy, Self::Socks5, Self::OpenVpn]
+    }
+}
+
 impl Default for AdvancedSettings {
     fn default() -> Self {
         Self {
@@ -212,6 +295,7 @@ impl SettingsUI {
             general: GeneralSettings::default(),
             privacy: PrivacySettings::default(),
             appearance: AppearanceSettings::default(),
+            network: NetworkSettings::default(),
             downloads: DownloadsSettings::default(),
             advanced: AdvancedSettings::default(),
             selected_panel: SettingsPanel::default(),
@@ -295,6 +379,7 @@ impl SettingsUI {
                 font_size: storage_settings.appearance.font_size,
                 show_bookmarks_bar: storage_settings.appearance.show_bookmarks_bar,
             },
+            network: NetworkSettings::default(), // Use defaults for new settings
             downloads: DownloadsSettings {
                 download_directory: storage_settings.general.download_directory.clone(),
                 ask_where_to_save: storage_settings.general.ask_where_to_save,
