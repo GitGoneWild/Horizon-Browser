@@ -1,8 +1,9 @@
 //! # Horizon Storage
 //!
 //! Storage layer for the Horizon Browser.
-//! Provides user data storage, settings, profiles, and secure storage.
+//! Provides user data storage, settings, profiles, secure storage, and password management.
 
+pub mod passwords;
 pub mod profile;
 pub mod secure;
 pub mod settings;
