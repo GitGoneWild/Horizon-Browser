@@ -16,4 +16,4 @@ reqwest = { workspace = true }
 serde = { workspace = true }
 
 # Additional dependencies for new features
-rand = "0.8"
+rand = "0.9"
