@@ -44,7 +44,7 @@ config = "0.14"
 
 # UI framework (using egui for cross-platform GUI)
 eframe = "0.29"
-egui = "0.29"
+egui = "0.33"
 
 # Cross-platform windowing
 winit = "0.30"
