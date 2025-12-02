@@ -43,7 +43,7 @@ reqwest = { version = "0.12", features = ["json"] }
 config = "0.14"
 
 # UI framework (using egui for cross-platform GUI)
-eframe = "0.29"
+eframe = "0.33"
 egui = "0.29"
 
 # Cross-platform windowing
